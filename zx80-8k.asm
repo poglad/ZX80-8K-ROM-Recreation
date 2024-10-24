@@ -8128,7 +8128,7 @@ L1AC2:  JP      L151D           ; exit via STACK-A to put value on the
 L1AC5:  CALL    L0EA7           ; routine FIND-INT to fetch the
                                 ; supplied address into BC.
 
-        LD      HL,STACK-HL     ; address: STACK-HL is
+        LD      HL,STACK_HL     ; address: STACK-HL is
         PUSH    HL              ; pushed onto the machine stack.
         PUSH    BC              ; then the address of the machine code
                                 ; routine.
