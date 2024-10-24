@@ -2708,7 +2708,9 @@ L0A1F:  LD      B,(IY+$22)      ; sv DF_SZ
 ;
 
 ;; CLS
-L0A2A:  LD      B,$18           ;
+L0A2A:  LD      BC,$0000        ; Initialize plot coordinates.
+        LD      ($4036),BC      ; Set system variable COORDS to 0,0.
+		LD      B,$18           ;
 
 ;; B-LINES
 L0A2C:  LD      C,$21           ;
