@@ -3211,7 +3211,6 @@ L0CB1:  DEFB    $05             ; Class-05 - Variable syntax checked entirely
                                 ; by routine.
         DEFW    L1E27           ; Address: $1E27; Address: DATA
 
-
 ; ---------------------------
 ; THE 'LINE SCANNING' ROUTINE
 ; ---------------------------
@@ -3728,7 +3727,6 @@ L0E62:  DEFB    $03             ;;subtract
         RET                     ; return.
 
 ; ---
-
 
 ;; IMPOSS
 L0E69:  DEFB    $34             ;;end-calc
@@ -6259,7 +6257,7 @@ L15F0:  DEFB    $34             ;;end-calc              x.
 ; no further rounding occurs. If the result is a 9 digit integer then
 ; rounding takes place within the buffer.
 
-        LD      HL,$406B        ; address system variable MEM-2-5th
+        LD      HL,$4049        ; address system variable MEM-2-5th
                                 ; which could be the 'ninth' digit.
         LD      (HL),$90        ; insert the value $90  10010000
 
