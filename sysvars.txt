@@ -37,7 +37,7 @@ S1		16438	COORDS	x-coordinate of last point PLOTted.
 S1		16439			y-coordinate of last point PLOTted.
 SX1		16441	S_POSN	Column number for PRINT position.
 SX1		16442			Line number for PRINT position.
-S1		16443	CDFLAG	Various flags. Bit 7 is on (1) during compute & display mode.
+S1		16443	FLAGK	Keyboard debounce flag.
 SN30	16444	MEMBOT	Calculator's memory area; used to store numbers that cannot conveniently be put on the calculator stack.
 S1		16473	DATADD	Data address (READ, RESTORE, DATA).
 S1		16474	NUSED2	not used	
@@ -58,3 +58,4 @@ S1		16474	NUSED2	not used
 
 4. PFMT now uses 16417 $4021
 
+5. CDFLAG renamed to FLAGK, as ZX80 has no compute & display mode.

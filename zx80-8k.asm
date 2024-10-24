@@ -659,7 +659,7 @@ L01FC:  INC     HL              ;
 ;
 
 ;; SLOW/FAST
-L0207:  LD      HL,$403A        ; Address the system variable CDFLAG.
+L0207:  LD      HL,$403A        ; Address the system variable FLAGK.
         LD      A,(HL)          ; Load value to the accumulator.
         RLA                     ; rotate bit 6 to position 7.
         XOR     (HL)            ; exclusive or with original bit 7.
@@ -702,7 +702,7 @@ L0216:  DJNZ    L0216           ; self loop to give the NMI a chance to kick in.
 ; ---
 
 ;; NO-SLOW
-L0226:  RES     6,(HL)          ; reset bit 6 of CDFLAG.
+L0226:  RES     6,(HL)          ; reset bit 6 of FLAGK.
         RET                     ; return.
 
 ; -----------------------
@@ -765,12 +765,12 @@ L023E:  CALL    L02BB           ; routine KEYBOARD gets the key row in H and
         LD      E,B             ; transfer the column value to E
         LD      B,$0B           ; and load B with eleven 
 
-        LD      HL,$403A        ; address system variable CDFLAG
-        RES     0,(HL)          ; reset the rightmost bit of CDFLAG
+        LD      HL,$403A        ; address system variable FLAGK
+        RES     0,(HL)          ; reset the rightmost bit of FLAGK
         JR      NZ,L0264        ; skip forward if debounce/diff >0 to NO-KEY
 
-        BIT     7,(HL)          ; test compute and display bit of CDFLAG
-        SET     0,(HL)          ; set the rightmost bit of CDFLAG.
+        BIT     7,(HL)          ; test compute and display bit of FLAGK
+        SET     0,(HL)          ; set the rightmost bit of FLAGK.
         RET     Z               ; return if bit 7 indicated fast mode.
 
         DEC     B               ; (4) decrement the counter.
@@ -845,7 +845,7 @@ L0292:  POP     IX              ; pop the return address to IX register.
                                 ; will be either L0281 or L028F - see above.
 
         LD      C,(IY+$28)      ; load C with value of system constant MARGIN.
-        BIT     7,(IY+$3A)      ; test CDFLAG for compute and display.
+        BIT     7,(IY+$3A)      ; test FLAGK for compute and display.
         JR      Z,L02A9         ; forward, with FAST mode, to DISPLAY-4
 
         LD      A,C             ; move MARGIN to A  - 31d or 55d.
@@ -980,12 +980,12 @@ L02C5:  OR      $E0             ; [7] OR %11100000
 ;
 
 ;; SET-FAST
-L02E7:  BIT     7,(IY+$3A)      ; sv CDFLAG
+L02E7:  BIT     7,(IY+$3A)      ; sv FLAGK
         RET     Z               ;
 
         HALT                    ; Wait for Interrupt
         OUT     ($FD),A         ;
-        RES     7,(IY+$3A)      ; sv CDFLAG
+        RES     7,(IY+$3A)      ; sv FLAGK
         RET                     ; return.
 
 
@@ -1334,7 +1334,7 @@ L03E5:  LD      HL,($4004)      ; fetch system variable RAMTOP.
         LD      IY,$4000        ; set IY to the start of RAM so that the 
                                 ; system variables can be indexed.
         LD		(IY+$21),$08	; default PFMT to 8
-        LD      (IY+$3A),$40    ; set CDFLAG 0100 0000. Bit 6 indicates 
+        LD      (IY+$3A),$40    ; set FLAGK 0100 0000. Bit 6 indicates 
                                 ; Compute nad Display required.
 
         LD      HL,$407D        ; The first location after System Variables -
@@ -1509,7 +1509,7 @@ L04B1:  DEC     HL              ;
 L04C1:  LD      HL,$0000        ;
         LD      ($4018),HL      ; sv X_PTR_lo
 
-        LD      HL,$403A        ; system variable CDFLAG
+        LD      HL,$403A        ; system variable FLAGK
         BIT     7,(HL)          ;
 
         CALL    Z,L0229         ; routine DISPLAY-1
@@ -4378,7 +4378,7 @@ L24F7:  JR      Z,L24EC         ; to D-L-PLOT
 
 ;; FAST
 L0F23:  CALL    L02E7           ; routine SET-FAST
-        RES     6,(IY+$3A)      ; sv CDFLAG
+        RES     6,(IY+$3A)      ; sv FLAGK
         RET                     ; return.
 
 ; --------------------------
@@ -4388,7 +4388,7 @@ L0F23:  CALL    L02E7           ; routine SET-FAST
 ;
 
 ;; SLOW
-L0F2B:  SET     6,(IY+$3A)      ; sv CDFLAG
+L0F2B:  SET     6,(IY+$3A)      ; sv FLAGK
         JP      L0207           ; to SLOW/FAST
 
 ; ---------------------------
@@ -4425,7 +4425,7 @@ L0F46:  LD      A,$7F           ; read port $7FFE - keys B,N,M,.,SPACE.
 ;
 
 ;; DEBOUNCE
-L0F4B:  RES     0,(IY+$3A)      ; update system variable CDFLAG
+L0F4B:  RES     0,(IY+$3A)      ; update system variable FLAGK
         LD      A,$FF           ;
         LD      ($4027),A       ; update system variable DEBOUNCE
         RET                     ; return.
