@@ -3159,11 +3159,18 @@ L0C0E:  LD      B,(IY+$22)      ; sv DF_SZ
 ; i) The Offset table
 
 ;; offset-t
-L0C29:  DEFB    L0CB4 - $       ; 8B offset to; Address: P-LPRINT
-        DEFB    L0CB7 - $       ; 8D offset to; Address: P-LLIST
+; -------------------
+; THE 'SYNTAX' TABLES
+; -------------------
+
+; i) The Offset table
+
+;; offset-t
+L0C29:  DEFB    L0CB4 - $       ; 8B offset to; Address: P-PLOT
+        DEFB    L0CB7 - $       ; 8D offset to; Address: P-UNDRAW
         DEFB    L0C58 - $       ; 2D offset to; Address: P-STOP
-        DEFB    L0CAB - $       ; 7F offset to; Address: P-SLOW
-        DEFB    L0CAE - $       ; 81 offset to; Address: P-FAST
+        DEFB    L0CAB - $       ; 7F offset to; Address: P-UNPLOT
+        DEFB    L0CAE - $       ; 81 offset to; Address: P-DRAW
         DEFB    L0C77 - $       ; 49 offset to; Address: P-NEW
         DEFB    L0CA4 - $       ; 75 offset to; Address: P-SCROLL
         DEFB    L0C8F - $       ; 5F offset to; Address: P-CONT
@@ -3180,16 +3187,16 @@ L0C29:  DEFB    L0CB4 - $       ; 8B offset to; Address: P-LPRINT
         DEFB    L0C66 - $       ; 2B offset to; Address: P-NEXT
         DEFB    L0C80 - $       ; 44 offset to; Address: P-POKE
         DEFB    L0C6A - $       ; 2D offset to; Address: P-PRINT
-        DEFB    L0C98 - $       ; 5A offset to; Address: P-PLOT
+        DEFB    L0C98 - $       ; 5A offset to; Address: P-READ
         DEFB    L0C7A - $       ; 3B offset to; Address: P-RUN
         DEFB    L0C8C - $       ; 4C offset to; Address: P-SAVE
         DEFB    L0C86 - $       ; 45 offset to; Address: P-RAND
         DEFB    L0C4F - $       ; 0D offset to; Address: P-IF
         DEFB    L0C95 - $       ; 52 offset to; Address: P-CLS
-        DEFB    L0C9E - $       ; 5A offset to; Address: P-UNPLOT
+        DEFB    L0C9E - $       ; 5A offset to; Address: P-RESTORE
         DEFB    L0C92 - $       ; 4D offset to; Address: P-CLEAR
         DEFB    L0C5B - $       ; 15 offset to; Address: P-RETURN
-        DEFB    L0CB1 - $       ; 6A offset to; Address: P-COPY
+        DEFB    L0CB1 - $       ; 6A offset to; Address: P-DATA
 
 ; ii) The parameter table.
 
@@ -3263,7 +3270,8 @@ L0C74:  DEFB    $05             ; Class-05 - Variable syntax checked entirely
         DEFW    L0D6A           ; Address: $0D6A; Address: REM
 
 ;; P-NEW
-L0C77:  DEFB    $00             ; Class-00 - No further operands.
+L0C77:  DEFB    $03             ; Class-03 - A numeric expression may follow
+                                ; else default to zero.
         DEFW    L03C3           ; Address: $03C3; Address: NEW
 
 ;; P-RUN
@@ -3310,19 +3318,15 @@ L0C92:  DEFB    $00             ; Class-00 - No further operands.
 L0C95:  DEFB    $00             ; Class-00 - No further operands.
         DEFW    L0A2A           ; Address: $0A2A; Address: CLS
 
-;; P-PLOT
-L0C98:  DEFB    $06             ; Class-06 - A numeric expression must follow.
-        DEFB    $1A             ; Separator:  ','
-        DEFB    $06             ; Class-06 - A numeric expression must follow.
-        DEFB    $00             ; Class-00 - No further operands.
-        DEFW    L0BAF           ; Address: $0BAF; Address: PLOT/UNP
+;; P-READ
+L0C98:  DEFB    $05             ; Class-05 - Variable syntax checked entirely
+                                ; by routine.
+		DEFW    L1DED           ; Address: $1DED; Address: READ
 
-;; P-UNPLOT
-L0C9E:  DEFB    $06             ; Class-06 - A numeric expression must follow.
-        DEFB    $1A             ; Separator:  ','
-        DEFB    $06             ; Class-06 - A numeric expression must follow.
-        DEFB    $00             ; Class-00 - No further operands.
-        DEFW    L0BAF           ; Address: $0BAF; Address: PLOT/UNP
+;; P-RESTORE
+L0C9E:	DEFB    $03             ; Class-03 - A numeric expression may follow
+                                ; else default to zero.
+		DEFW	L1E42
 
 ;; P-SCROLL
 L0CA4:  DEFB    $00             ; Class-00 - No further operands.
@@ -3333,13 +3337,38 @@ L0CA7:  DEFB    $06             ; Class-06 - A numeric expression must follow.
         DEFB    $00             ; Class-00 - No further operands.
         DEFW    L0F32           ; Address: $0F32; Address: PAUSE
 
-;; P-SLOW
-L0CAB:  DEFB    $00             ; Class-00 - No further operands.
-        DEFW    L0F2B           ; Address: $0F2B; Address: SLOW
+;; P-PLOT
+L0CB4:	DEFB    $06             ; Class-06 - A numeric expression must follow.
+        DEFB    $1A             ; Separator:  ','
+        DEFB    $06             ; Class-06 - A numeric expression must follow.
+        DEFB    $00             ; Class-00 - No further operands.
+        DEFW    L0BAF           ; Address: $0BAF; Address: PLOT/UNP
 
-;; P-FAST
-L0CAE:  DEFB    $00             ; Class-00 - No further operands.
-        DEFW    L0F23           ; Address: $0F23; Address: FAST
+;; P-DRAW
+L0CAE:  DEFB    $06             ; Class-06 - A numeric expression must follow.
+        DEFB    $1A             ; Separator:  ','
+        DEFB    $06             ; Class-06 - A numeric expression must follow.
+        DEFB    $00             ; Class-00 - No further operands.
+        DEFW    L24B7           ; Address: $24B7; Address: DRAW-LINE
+
+;; P-UNPLOT
+L0CAB:  DEFB    $06             ; Class-06 - A numeric expression must follow.
+        DEFB    $1A             ; Separator:  ','
+        DEFB    $06             ; Class-06 - A numeric expression must follow.
+        DEFB    $00             ; Class-00 - No further operands.
+        DEFW    L0BAF           ; Address: $0BAF; Address: PLOT/UNP
+
+;; P-UNDRAW
+L0CB7:  DEFB    $06             ; Class-06 - A numeric expression must follow.
+        DEFB    $1A             ; Separator:  ','
+        DEFB    $06             ; Class-06 - A numeric expression must follow.
+        DEFB    $00             ; Class-00 - No further operands.
+        DEFW    L24B7           ; Address: $24B7; Address: DRAW-LINE
+
+;; P-DATA
+L0CB1:  DEFB    $05             ; Class-05 - Variable syntax checked entirely
+                                ; by routine.
+        DEFW    L1E27           ; Address: $1E27; Address: DATA
 
 
 ; ---------------------------
