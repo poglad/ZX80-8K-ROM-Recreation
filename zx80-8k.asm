@@ -3072,6 +3072,7 @@ L0BAB:  CALL    L0918           ; routine LOC-ADDR
 
 ;; PLOT/UNP
 L0BAF:  CALL    L0BF5           ; routine STK-TO-BC
+PLOTSUB:
         LD      ($4036),BC      ; sv COORDS_x
         LD      A,$2B           ;
         SUB     B               ;
@@ -3224,7 +3225,7 @@ L0C29:  DEFB    L0CB4 - $       ; 8B offset to; Address: P-PLOT
         DEFB    L0C86 - $       ; 45 offset to; Address: P-RAND
         DEFB    L0C4F - $       ; 0D offset to; Address: P-IF
         DEFB    L0C95 - $       ; 52 offset to; Address: P-CLS
-        DEFB    L0CAB - $       ; 5A offset to; Address: P-RESTORE
+        DEFB    L0C9E - $       ; 5A offset to; Address: P-RESTORE
         DEFB    L0C92 - $       ; 4D offset to; Address: P-CLEAR
         DEFB    L0C5B - $       ; 15 offset to; Address: P-RETURN
         DEFB    L0CB1 - $       ; 6A offset to; Address: P-DATA
@@ -3355,7 +3356,7 @@ L0C98:  DEFB    $05             ; Class-05 - Variable syntax checked entirely
 		DEFW    L1DED           ; Address: $1DED; Address: READ
 
 ;; P-RESTORE
-L0CAB:	DEFB    $03             ; Class-03 - A numeric expression may follow
+L0C9E:	DEFB    $03             ; Class-03 - A numeric expression may follow
                                 ; else default to zero.
 		DEFW	L1E42
 
@@ -3629,7 +3630,7 @@ L0D6A:  RET                     ;
 
 ;; CLASS-2
 L0D6B:  POP     BC              ;
-        LD      A,($4001)       ; sv FLAGS
+L0D6C:  LD      A,($4001)       ; sv FLAGS
 
 ;; INPUT-REP
 L0D6F:  PUSH    AF              ;
@@ -3879,7 +3880,7 @@ L0E2E:  BIT     1,(IY+$2D)      ; sv FLAGX
         INC     HL              ;
         LD      D,(HL)          ;
         EX      DE,HL           ;
-        JR      L0E86           ; to GOTO-2
+        JP      L0E86           ; to GOTO-2
 
 ; ---
 
