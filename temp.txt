@@ -1,4 +1,3 @@
- 
 ; ==============================================================
 ; An Assembly Listing of the Operating System of the ZX80 8K ROM
 ; ==============================================================
@@ -382,7 +381,7 @@ L00A5:  DEFB    $0E             ; :
         DEFB    $15             ; +
         DEFB    $16             ; -
         DEFB    $D8             ; **
-        DEFB    $0C             ; £
+        DEFB    $0C             ; �
         DEFB    $1A             ; ,
         DEFB    $12             ; >
         DEFB    $13             ; <
@@ -562,7 +561,7 @@ L01FC:  INC     HL              ;
         RET     NC              ; return if more bytes to load/save.
 
         POP     HL              ; else drop return address
-        RET
+		RET
 
 ; -----------------------
 ; THE 'MAIN DISPLAY' LOOP
@@ -1142,7 +1141,7 @@ L03E5:  LD      HL,($4004)      ; fetch system variable RAMTOP.
                                 ; the base of the now empty machine stack.
 
 ; Now set the I register so that the video hardware knows where to find the
-; character set. This ROM does not reference the character set directly 
+; character set. This ROM does not reference the character set directly
 ; at all. The TV picture is formed by the external video hardware.
 
         LD      A,$1E           ; address for this ROM is $1E00.
@@ -1151,9 +1150,8 @@ L03E5:  LD      HL,($4004)      ; fetch system variable RAMTOP.
 
         LD      IY,$4000        ; set IY to the start of RAM so that the 
                                 ; system variables can be indexed.
-        LD		(IY+$21),$08	; default PFMT to 8
-        LD      (IY+$3A),$40    ; set FLAGK 0100 0000. Bit 6 indicates 
-                                ; Compute nad Display required.
+		LD		(IY+$21),$08	; default PFMT to 8
+        LD      (IY+$3A),$00	; clear FLAGK.
 
 		LD		HL,$405A		; Location before the first program line
 								; - 16474 decimal.
@@ -1378,7 +1376,7 @@ L04F7:  LD      A,(HL)          ;
         SET     7,A             ;
         JR      C,L051B         ; to ENTER
 
-        LD      HL,$00C7        ; (expr reqd)
+        LD      HL,L00CC-$05    ; (expr reqd)
 
 ;; TABLE-ADD
 L0505:  ADD     HL,DE           ;
@@ -1434,7 +1432,7 @@ L052B:  LD      A,$78           ;
 
 ;; KEY-SORT
 L052D:  LD      E,A             ;
-        LD      HL,$0482        ; base address of ED-KEYS (exp reqd)
+        LD      HL,L0562-$E0    ; base address of ED-KEYS (exp reqd)
         ADD     HL,DE           ;
         ADD     HL,DE           ;
         LD      C,(HL)          ;
@@ -1707,6 +1705,9 @@ L060C:  CALL    L0A1F           ; routine LINE-ENDS
         JR      NZ,L0629        ; to NOW-SCAN
 
         LD      HL,($4014)      ; sv E_LINE_lo
+;        LD      A,(HL)          ; 'COPY' command
+;        CP      $FF             ;
+;        JR      Z,L0626         ; to STK-UPPER
 
         CALL    L0A2A           ; routine CLS
 
@@ -2038,7 +2039,7 @@ L07C7:  ADD     A,L             ;
         LD      L,$01           ;
         JR      NZ,L07C7        ; to KEY-LINE
 
-        LD      HL,$007D        ; (expr reqd)
+        LD      HL,L007E-$01    ; (expr reqd)
         LD      E,A             ;
         ADD     HL,DE           ;
         SCF                     ; Set Carry Flag
@@ -2086,7 +2087,12 @@ L07F1:  RES     0,(IY+$01)      ; update FLAGS - signal leading space permitted
 L07F5:  EXX                     ;
         PUSH    HL              ;
         CALL    L0808           ; routine ENTER-CH
-        POP     HL              ;
+        JR      L0805           ; to PRINT-EXX
+
+; ---
+
+;; PRINT-EXX
+L0805:  POP     HL              ;
         EXX                     ;
         RET                     ;
 
@@ -2405,7 +2411,7 @@ L09DE:  POP     BC              ;
         RET     NC              ;
 
         PUSH    BC              ;
-        CALL     L09F2          ; routine NEXT-ONE
+        CALL    L09F2           ; routine NEXT-ONE
         EX      DE,HL           ;
         JR      L09DE           ; to NEXT-TEST
 
@@ -2714,7 +2720,6 @@ L0AD5:  SUB     $1A             ;
 L0AFA:  CP      $A8             ;
         JR      NZ,L0B31        ; to NOT-TAB
 
-
         RST     20H             ; NEXT-CHAR
         CALL    L0D92           ; routine CLASS-6
         CALL    L0B4E           ; routine SYNTAX-ON
@@ -2766,11 +2771,11 @@ TO_E:	RST     20H             ; NEXT-CHAR
 		SET		7,C
 
 TO_ON:	CALL    L0B4E           ; routine SYNTAX-ON
-		LD		(IY+$21),C      ; sv PFMT
+		LD		(IY+$21),C
         JR      L0B37           ; to PRINT-ON
 
 ;; NOT-TO
-NOT_TO: CALL    L0F55           ; routine SCANNING
+NOT_TO:	CALL    L0F55           ; routine SCANNING
         CALL    L0B55           ; routine PRINT-STK
 
 ;; PRINT-ON
@@ -3211,7 +3216,6 @@ L0CB7:  DEFB    $06             ; Class-06 - A numeric expression must follow.
 L0CB1:  DEFB    $05             ; Class-05 - Variable syntax checked entirely
                                 ; by routine.
         DEFW    L1E27           ; Address: $1E27; Address: DATA
-
 
 ; ---------------------------
 ; THE 'LINE SCANNING' ROUTINE
@@ -3730,7 +3734,6 @@ L0E62:  DEFB    $03             ;;subtract
 
 ; ---
 
-
 ;; IMPOSS
 L0E69:  DEFB    $34             ;;end-calc
 
@@ -4052,6 +4055,10 @@ L0EE5:  EX      (SP),HL         ;
 L0EE9:  BIT     7,(IY+$08)      ; sv PPC_hi
         JR      NZ,L0F21        ; to REPORT-8
 
+; uncomment the next line to include improvement from second ZX81 ROM
+; on the assumption that it was removed to save space when
+; adding the printer ROM routines, I shall restore it here
+; in this 'original' ROM
         CALL    L14A3           ; routine X-TEMP
         LD      HL,$402D        ; sv FLAGX
         SET     5,(HL)          ;
@@ -4184,8 +4191,12 @@ L0F32:  CALL    L0EA7           ; routine FIND-INT
         LD      L,C             ;
         CALL    L022D           ; routine DISPLAY-P
 
+; uncomment to include improvement from second ZX81 ROM
         LD      (IY+$35),$FF    ; sv FRAMES_hi
-
+; and comment this instead
+; clearly a space-saving version for the printer ROM, so
+; not to be included in the 'original' ROM
+;		SET		7,(IY+$35)
         JR      L0F4B           ; routine DEBOUNCE
 
 ; ----------------------
@@ -4206,7 +4217,7 @@ L0F46:  LD      A,$7F           ; read port $7FFE - keys B,N,M,.,SPACE.
 ;
 
 ;; DEBOUNCE
-L0F4B:  RES     0,(IY+$3A)      ; update system variable FLAGK
+L0F4B:  LD      (IY+$3A),$00	; clear FLAGK.
         LD      A,$FF           ;
         LD      ($4027),A       ; update system variable DEBOUNCE
         RET                     ; return.
@@ -4467,7 +4478,6 @@ L1025:  CP      $26             ; compare to 'A'.
 ; not to be included in the 'original' ROM
 ;		BIT		6,(IY+$01)
 ;		JR      Z,L1087
-
         INC     HL              ; address numeric contents of variable.
         LD      DE,($401C)      ; set destination to STKEND
         CALL    L19F6           ; routine MOVE-FP stacks the five bytes
@@ -4996,10 +5006,11 @@ L120C:  PUSH    BC              ;
         CALL    L12FF           ; routine DE,(DE+1)
         EX      (SP),HL         ;
         EX      DE,HL           ;
+		DEC		HL
         CALL    L12DD           ; routine INT-EXP1
         JR      C,L1231         ; forward to REPORT-3
 
-        DEC     BC              ;
+;        DEC     BC              ;
         CALL    L1305           ; routine GET-HL*DE
         ADD     HL,BC           ;
         POP     DE              ;
@@ -5096,8 +5107,11 @@ L1263:  CALL    L0DA6           ; routine SYNTAX-Z
         JR      Z,L1292         ; forward if so to SL-SECOND
 
         POP     AF              ;
+		DEC		HL
         CALL    L12DE           ; routine INT-EXP2
+		INC		HL
         PUSH    AF              ;
+		INC		BC				;
         LD      D,B             ;
         LD      E,C             ;
         PUSH    HL              ;
@@ -5127,8 +5141,10 @@ L1292:  PUSH    HL              ;
         JR      Z,L12A5         ; forward if so to SL-DEFINE
 
         POP     AF              ;
+		DEC		HL
         CALL    L12DE           ; routine INT-EXP2
         PUSH    AF              ;
+		INC		BC				;
 
         RST     18H             ; GET-CHAR
         LD      H,B             ;
@@ -5143,7 +5159,7 @@ L12A5:  POP     AF              ;
         DEC     HL              ;
         EX      (SP),HL         ;
         AND     A               ;
-        SBC     HL,DE           ;
+		SBC     HL,DE           ;
         LD      BC,$0000        ;
         JR      C,L12B9         ; forward to SL-OVER
 
@@ -5157,7 +5173,7 @@ L12A5:  POP     AF              ;
 ;; SL-OVER
 L12B9:  POP     DE              ;
         RES     6,(IY+$01)      ; sv FLAGS  - Signal string result
-
+		
 ;; SL-STORE
 L12BE:  CALL    L0DA6           ; routine SYNTAX-Z
         RET     Z               ; return if checking syntax.
@@ -5211,10 +5227,10 @@ L12DE:  PUSH    DE              ;
         PUSH    AF              ;
         CALL    L0EA7           ; routine FIND-INT
         POP     DE              ;
-        LD      A,B             ;
-        OR      C               ;
-        SCF                     ; Set Carry Flag
-        JR      Z,L12F9         ; forward to I-CARRY
+;        LD      A,B             ;
+;        OR      C               ;
+;        SCF                     ; Set Carry Flag
+;        JR      Z,L12F9         ; forward to I-CARRY
 
         POP     HL              ;
         PUSH    HL              ;
@@ -5570,7 +5586,7 @@ L1435:  RST     20H             ; NEXT-CHAR
         LD      H,$40           ;
         CALL    L12DD           ; routine INT-EXP1
         JP      C,L1231         ; jump back to REPORT-3
-
+		INC		BC				;
         POP     HL              ;
         PUSH    BC              ;
         INC     H               ;
@@ -5827,6 +5843,11 @@ L1511:  DEFB    $38             ;;e-to-fp               x.
 
         RET                     ; return.
 
+;; STACK-HL
+STACK_HL:
+		PUSH	HL
+		JR		L1520a
+
 
 ; --------------------------
 ; THE 'STK-DIGIT' SUBROUTINE
@@ -5860,8 +5881,8 @@ L151D:  LD      C,A             ;
 ; must be converted to their full floating-point form.
 
 ;; STACK-BC
-L1520:  LD      IY,$4000        ; re-initialize the system variables pointer.
-        PUSH    BC              ; save the integer value.
+L1520:  PUSH    BC              ; save the integer value.
+L1520a: LD      IY,$4000        ; re-initialize the system variables pointer.
 
 ; now stack zero, five zero bytes as a starting point.
 
@@ -6251,7 +6272,7 @@ L15F0:  DEFB    $34             ;;end-calc              x.
 ; no further rounding occurs. If the result is a 9 digit integer then
 ; rounding takes place within the buffer.
 
-        LD      HL,$406B        ; address system variable MEM-2-5th
+        LD      HL,$4049        ; address system variable MEM-2-5th
                                 ; which could be the 'ninth' digit.
         LD      (HL),$90        ; insert the value $90  10010000
 
@@ -6289,12 +6310,11 @@ L1615:  INC     HL              ; increase pointer
 ; e.g. for 'one' we have zero as estimate of leading digits.
 ; 1*10^8 100000000 as integer value
 ; 90 90 90 90 90   90 90 90 91 90 as buffer mem3/mem4 contents.
-
-
         INC     HL              ; advance pointer to one past buffer 
-		LD		A,($4021)       ; get value in PFMT
-		AND		$7F             ; don't permit use of bit 7 as it's the E flag
-		LD 		C,A             ; ZX81 always used 8 for this
+;        LD      BC,$0008        ; set C to 8 ( B is already zero )
+		LD		A,($4021)
+		AND		$7F
+		LD 		C,A
         PUSH    HL              ; save pointer.
 
 ;; PF-NULL
@@ -6304,7 +6324,6 @@ L162C:  DEC     HL              ; decrease pointer
         JR      Z,L162C         ; loop back if so to PF-NULL
 
 ; at this point a significant digit has been found. carry is reset.
-
         SBC     HL,BC           ; subtract eight from the address.
         PUSH    HL              ; ** save this pointer too
         LD      A,(HL)          ; fetch addressed byte
@@ -6335,28 +6354,30 @@ L1639:  POP     AF              ; retrieve carry from machine stack.
                                 ; to consider further rounding and/or trailing
                                 ; zero identification.
 
-        LD		A,$0E           ; initialize B
-		SUB		(IY+$21)        ; based on PFMT
-		AND		$0F             ; rather than hard-coding 6 below
-		LD		B,A             ; like the ZX81 did
+		LD		A,$0E
+		SUB		(IY+$21)
+		AND		$0F
+		LD		B,A
 
-        POP     AF              ; balance stack
+		POP     AF              ; balance stack
         POP     HL              ; ** retrieve lower pointer
 
-; now insert B trailing zeros which are printed if before the decimal point
+; now insert 6 trailing zeros which are printed if before the decimal point
 ; but mark the end of printing if after decimal point.
 ; e.g. 9876543210123 is printed as 9876543200000
 ; 123.456001 is printed as 123.456
 
-;; PF-ZERO-B
+;        LD      B,$06           ; the count is six.
+
+;; PF-ZERO-6
 L164B:  LD      (HL),$80        ; insert a masked zero
         DEC     HL              ; decrease pointer.
-        DJNZ    L164B           ; loop back for all six to PF-ZERO-B
+        DJNZ    L164B           ; loop back for all six to PF-ZERO-6
 
 ; n-mod-m reduced the number to zero and this is now deleted from the calculator
 ; stack before fetching the original estimate of leading digits.
 
-
+PF_ZERO_7:
         RST     28H             ;; FP-CALC              0.
         DEFB    $02             ;;delete                .
         DEFB    $E1             ;;get-mem-1             n.
@@ -6381,8 +6402,7 @@ L165F:  DEC     HL              ; decrement address.
         JR      Z,L165F         ; back with leading zero to GET-FIRST
 
 ; now determine if E-format printing is needed
-
-		BIT		7,(IY+$21)		; check flag in bit 7 of PFMT
+		BIT		7,(IY+$21)		; check flag
         JP      NZ,L1682        ; forward if formatted with E to PF-E-FMT
 
         LD      A,E             ; transfer now accurate number count to A.
@@ -6687,8 +6707,8 @@ L1722:  EXX                     ; - - -
 L1736:  EXX                     ; select alternate set for more significant 
                                 ; bytes.
 
-; comment out these three lines to include improvements from second ZX81 ROM
-; John Grant says this was introduced in the first ZX81 ROM with printer code,
+; comment these three lines to include improvements from second ZX81 ROM
+; John Grant claims this was introduced in the first ZX81 ROM with printer code,
 ; which would mean they should not be present in this 'original' ZX80 8K ROM.
 ; It's not clear to me how/why they could have been introduced at that point,
 ; but I'll trust him and comment them out here.
@@ -6696,8 +6716,7 @@ L1736:  EXX                     ; select alternate set for more significant
 ;		SUB		L
 ;		LD		H,A
 
-        XOR     A               ; clear accumulator.
-
+		XOR     A               ; clear accumulator.
 
 ; this entry point (from multiplication) sets four of the bytes to zero or if 
 ; continuing from above, during addition, then all five bytes are set to zero.
@@ -7621,7 +7640,8 @@ L19AE:  PUSH    HL              ; save pointer on stack   *
 ; the branch was here with simple literals.
 
 ;; FIRST-3D
-L19C2:  CP      $18             ; compare with first unary operations.
+L19C2:  CP      $18             ; compare with
+ first unary operations.
         JR      NC,L19CE        ; to DOUBLE-A with unary operations
 
 ; it is binary so adjust pointers.
@@ -8116,14 +8136,14 @@ L1AC2:  JP      L151D           ; exit via STACK-A to put value on the
 L1AC5:  CALL    L0EA7           ; routine FIND-INT to fetch the
                                 ; supplied address into BC.
 
-        LD      HL,L1520        ; address: STACK-BC is
+;        LD      HL,L1520        ; address: STACK-BC is
+        LD      HL,STACK_HL     ; address: STACK-HL is
         PUSH    HL              ; pushed onto the machine stack.
         PUSH    BC              ; then the address of the machine code
                                 ; routine.
 
         RET                     ; make an indirect jump to the routine
-                                ; and, hopefully, to STACK-BC also.
-
+                                ; and, hopefully, to STACK-HL also.
 
 ; -----------------------
 ; Greater than zero ($33)
@@ -9633,12 +9653,22 @@ L1DFD:  DEFB    $34             ;;end-calc              last value 1 or 0.
 
         RET                     ; return.
 
+; --------------
+; ROM IDENTIFIER		
+; --------------
+
+	DEFB	$35,$39,$20,$14		; PT 2014
+
 ; ---------------------
 ; THE 'SPARE LOCATIONS'
 ; ---------------------
 
 ;; SPARE
-L1DFF:  DEFB    $FF             ; That's all folks.
+	DEFB	$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF	; unused locations.
+	DEFB	$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF	; unused locations.
+	DEFB	$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF	; unused locations.
+	DEFB	$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF	; unused locations.
+	DEFB	$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF		; That's all folks.
 
 #ifdef FONT_ZX80	
 
@@ -10494,7 +10524,7 @@ L1E00:  DEFB    %00000000
         DEFB    %00000000
         DEFB    %00000000
 
-; $0B - Character:  £           CHR$(12)
+; $0B - Character:  ?           CHR$(12)
 
         DEFB    %00000000
         DEFB    %00011100
