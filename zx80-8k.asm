@@ -2874,7 +2874,7 @@ L0ACF:  LD      A,(HL)          ;
 ;; PRINT-1
 L0AD5:  SUB     $1A             ;
         ADC     A,$00           ;
-        JR      Z,L0B44         ; to SPACING
+        JP      Z,L0B44         ; to SPACING
 
         CP      $A7             ;
         JR      NZ,L0AFA        ; to NOT-AT
@@ -3061,7 +3061,7 @@ L0BA4:  LD      C,$11           ;
         LD      C,$01           ;
 
 ;; RIGHT
-L0BAB:  CALL    L090B           ; routine SET-FIELD
+L0BAB:  CALL    L0918           ; routine LOC-ADDR
         RET                     ;
 
 ; --------------------------------------
