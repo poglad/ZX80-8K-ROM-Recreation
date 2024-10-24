@@ -41,7 +41,7 @@ S1		16443	FLAGK	Keyboard debounce flag.
 SN30	16444	MEMBOT	Calculator's memory area; used to store numbers that cannot conveniently be put on the calculator stack.
 S2		16473	DATADD	Data address (READ, RESTORE, DATA).
 
-1. PRBUFF deleted
+1. PR_BUFF deleted
 	MEMBOT moves up from 16477 $405D to 16444 $403C
 	NUSED2 moves up from 16507 $407B to 16474 $405A
 

@@ -1980,9 +1980,7 @@ L066C:  LD      ($4029),HL      ; sv NXTLIN_lo
         LD      (HL),$0C        ;
 
 ;; STOP-LINE
-L06AE:  BIT     7,(IY+$38)      ; sv PR_CC
-        CALL    Z,L0871         ; routine COPY-BUFF
-        LD      BC,$0121        ;
+L06AE:  LD      BC,$0121        ;
         CALL    L0918           ; routine LOC-ADDR
         LD      A,($4000)       ; sv ERR_NR
         LD      BC,($4007)      ; sv PPC_lo
