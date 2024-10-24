@@ -4677,9 +4677,15 @@ L1025:  CP      $26             ; compare to 'A'.
         CALL    Z,L11A7         ; routine STK-VAR stacks string parameters or
                                 ; returns cell location if numeric.
 
+; uncomment next three lines to include improvements from second ZX81 ROM
         LD      A,($4001)       ; fetch FLAGS
         CP      $C0             ; compare to numeric result/numeric operand
         JR      C,L1087         ; forward if not numeric to S-CONT-2
+; and comment these two instead
+; clearly a space-saving version for the printer ROM, so
+; not to be included in the 'original' ROM
+;		BIT		6,(IY+$01)
+;		JR      Z,L1087
 
         INC     HL              ; address numeric contents of variable.
         LD      DE,($401C)      ; set destination to STKEND
@@ -6899,6 +6905,16 @@ L1722:  EXX                     ; - - -
 ;; ADDEND-0
 L1736:  EXX                     ; select alternate set for more significant 
                                 ; bytes.
+
+; comment out these three lines to include improvements from second ZX81 ROM
+; John Grant says this was introduced in the first ZX81 ROM with printer code,
+; which would mean they should not be present in this 'original' ZX80 8K ROM.
+; It's not clear to me how/why they could have been introduced at that point,
+; but I'll trust him and comment them out here.
+;		LD		A,H
+;		SUB		L
+;		LD		H,A
+
         XOR     A               ; clear accumulator.
 
 
