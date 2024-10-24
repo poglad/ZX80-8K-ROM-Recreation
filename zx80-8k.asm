@@ -4117,6 +4117,87 @@ L0F14:  DEC     HL              ;
 L0F21:  RST     08H             ; ERROR-1
         DEFB    $07             ; Error Report: End of file
 
+;; DRAW-LINE
+L24B7:  CALL    L0BF5           ; routine STK-TO-BC
+
+        LD      A,C             ;
+        CP      B               ;
+        JR      NC,L24C4        ; to DL-X-GE-Y
+
+        LD      L,C             ;
+        PUSH    DE              ;
+        XOR     A               ;
+        LD      E,A             ;
+        JR      L24CB           ; to DL-LARGER
+
+; ---
+
+;; DL-X-GE-Y
+L24C4:  OR      C               ;
+        RET     Z               ;
+
+        LD      L,B             ;
+        LD      B,C             ;
+        PUSH    DE              ;
+        LD      D,$00           ;
+
+;; DL-LARGER
+L24CB:  LD      H,B             ;
+        LD      A,B             ;
+        RRA                     ;
+
+;; D-L-LOOP
+L24CE:  ADD     A,L             ;
+        JR      C,L24D4         ; to D-L-DIAG
+
+        CP      H               ;
+        JR      C,L24DB         ; to D-L-HR-VT
+
+;; D-L-DIAG
+L24D4:  SUB     H               ;
+        LD      C,A             ;
+        EXX                     ;
+        POP     BC              ;
+        PUSH    BC              ;
+        JR      L24DF           ; to D-L-STEP
+
+; ---
+
+;; D-L-HR-VT
+L24DB:  LD      C,A             ;
+        PUSH    DE              ;
+        EXX                     ;
+        POP     BC              ;
+
+;; D-L-STEP
+L24DF:  LD      HL,($4036)      ; COORDS
+        LD      A,B             ;
+        ADD     A,H             ;
+        LD      B,A             ;
+        LD      A,C             ;
+        INC     A               ;
+        ADD     A,L             ;
+        JR      C,L24F7         ; to D-L-RANGE
+
+        JP      Z,L1BA2         ; to REPORT-Bc
+
+;; D-L-PLOT
+L24EC:  DEC     A               ;
+        LD      C,A             ;
+        CALL    PLOTSUB         ; routine PLOT-SUB
+        EXX                     ;
+        LD      A,C             ;
+        DJNZ    L24CE           ; to D-L-LOOP
+
+        POP     DE              ;
+        RET                     ;
+
+; ---
+
+;; D-L-RANGE
+L24F7:  JR      Z,L24EC         ; to D-L-PLOT
+		JP		L1BA2
+
 ; ---------------------------
 ; THE 'PAUSE' COMMAND ROUTINE
 ; ---------------------------
