@@ -442,10 +442,10 @@ L00A5:  DEFB    $0E             ; :
         DEFB    $0F             ; ?
         DEFB    $18             ; /
         DEFB    $E3             ; STOP
-        DEFB    $E1             ; LPRINT
-        DEFB    $E4             ; SLOW
-        DEFB    $E5             ; FAST
-        DEFB    $E2             ; LLIST
+        DEFB    $E1             ; PLOT
+        DEFB    $E4             ; UNPLOT
+        DEFB    $E5             ; DRAW
+        DEFB    $E2             ; UNDRAW
         DEFB    $C0             ; ""
         DEFB    $D9             ; OR
         DEFB    $E0             ; STEP
@@ -471,7 +471,7 @@ L00A5:  DEFB    $0E             ; :
         DEFB    $15             ; +
         DEFB    $16             ; -
         DEFB    $D8             ; **
-        DEFB    $0C             ;  £ 
+        DEFB    $0C             ; £
         DEFB    $1A             ; ,
         DEFB    $12             ; >
         DEFB    $13             ; <
@@ -583,7 +583,7 @@ L0111:  DEFB    $0F+$80                         ; '?'+$80
         DEFB    $31,$33+$80                     ; LN
         DEFB    $2A,$3D,$35+$80                 ; EXP
         DEFB    $2E,$33,$39+$80                 ; INT
-        DEFB    $38,$36,$37+$80                 ; SQR
+        DEFB    $38,$36,$37,$39+$80             ; SQRT
         DEFB    $38,$2C,$33+$80                 ; SGN
         DEFB    $26,$27,$38+$80                 ; ABS
         DEFB    $35,$2A,$2A,$30+$80             ; PEEK
@@ -600,19 +600,19 @@ L0111:  DEFB    $0F+$80                         ; '?'+$80
         DEFB    $39,$2D,$2A,$33+$80             ; THEN
         DEFB    $39,$34+$80                     ; TO
         DEFB    $38,$39,$2A,$35+$80             ; STEP
-        DEFB    $31,$35,$37,$2E,$33,$39+$80     ; LPRINT
-        DEFB    $31,$31,$2E,$38,$39+$80         ; LLIST
+        DEFB    $35,$31,$34,$39+$80             ; PLOT
+        DEFB    $3A,$33,$29,$37,$26,$3C+$80     ; UNDRAW
         DEFB    $38,$39,$34,$35+$80             ; STOP
-        DEFB    $38,$31,$34,$3C+$80             ; SLOW
-        DEFB    $2B,$26,$38,$39+$80             ; FAST
+        DEFB    $3A,$33,$35,$31,$34,$39+$80     ; UNPLOT
+        DEFB    $29,$37,$26,$3C+$80             ; DRAW
         DEFB    $33,$2A,$3C+$80                 ; NEW
         DEFB    $38,$28,$37,$34,$31,$31+$80     ; SCROLL
         DEFB    $28,$34,$33,$39+$80             ; CONT
         DEFB    $29,$2E,$32+$80                 ; DIM
         DEFB    $37,$2A,$32+$80                 ; REM
         DEFB    $2B,$34,$37+$80                 ; FOR
-        DEFB    $2C,$34,$39,$34+$80             ; GOTO
-        DEFB    $2C,$34,$38,$3A,$27+$80         ; GOSUB
+        DEFB    $2C,$34,$00,$39,$34+$80         ; GO TO
+        DEFB    $2C,$34,$00,$38,$3A,$27+$80     ; GO SUB
         DEFB    $2E,$33,$35,$3A,$39+$80         ; INPUT
         DEFB    $31,$34,$26,$29+$80             ; LOAD
         DEFB    $31,$2E,$38,$39+$80             ; LIST
@@ -621,20 +621,19 @@ L0111:  DEFB    $0F+$80                         ; '?'+$80
         DEFB    $33,$2A,$3D,$39+$80             ; NEXT
         DEFB    $35,$34,$30,$2A+$80             ; POKE
         DEFB    $35,$37,$2E,$33,$39+$80         ; PRINT
-        DEFB    $35,$31,$34,$39+$80             ; PLOT
+        DEFB    $37,$2A,$26,$29+$80             ; READ
         DEFB    $37,$3A,$33+$80                 ; RUN
         DEFB    $38,$26,$3B,$2A+$80             ; SAVE
         DEFB    $37,$26,$33,$29+$80             ; RAND
         DEFB    $2E,$2B+$80                     ; IF
         DEFB    $28,$31,$38+$80                 ; CLS
-        DEFB    $3A,$33,$35,$31,$34,$39+$80     ; UNPLOT
+        DEFB    $37,$2A,$38,$39,$34,$37,$2A+$80 ; RESTORE
         DEFB    $28,$31,$2A,$26,$37+$80         ; CLEAR
-        DEFB    $37,$2A,$39,$3A,$37,$33+$80     ; RETURN
-        DEFB    $28,$34,$35,$3E+$80             ; COPY
+        DEFB    $37,$2A,$39+$80                 ; RET
+        DEFB    $29,$26,$39,$26+$80             ; DATA
         DEFB    $37,$33,$29+$80                 ; RND
         DEFB    $2E,$33,$30,$2A,$3E,$0D+$80     ; INKEY$
         DEFB    $35,$2E+$80                     ; PI
-
 
 ; ------------------------------
 ; THE 'LOAD-SAVE UPDATE' ROUTINE
