@@ -1152,8 +1152,7 @@ L03E5:  LD      HL,($4004)      ; fetch system variable RAMTOP.
         LD      IY,$4000        ; set IY to the start of RAM so that the 
                                 ; system variables can be indexed.
         LD		(IY+$21),$08	; default PFMT to 8
-        LD      (IY+$3A),$40    ; set FLAGK 0100 0000. Bit 6 indicates 
-                                ; Compute nad Display required.
+        LD      (IY+$3A),$00	; clear FLAGK.
 
 		LD		HL,$405A		; Location before the first program line
 								; - 16474 decimal.
@@ -2405,7 +2404,7 @@ L09DE:  POP     BC              ;
         RET     NC              ;
 
         PUSH    BC              ;
-        CALL     L09F2          ; routine NEXT-ONE
+        CALL    L09F2           ; routine NEXT-ONE
         EX      DE,HL           ;
         JR      L09DE           ; to NEXT-TEST
 
@@ -2770,7 +2769,7 @@ TO_ON:	CALL    L0B4E           ; routine SYNTAX-ON
         JR      L0B37           ; to PRINT-ON
 
 ;; NOT-TO
-NOT_TO: CALL    L0F55           ; routine SCANNING
+NOT_TO:	CALL    L0F55           ; routine SCANNING
         CALL    L0B55           ; routine PRINT-STK
 
 ;; PRINT-ON
@@ -4206,7 +4205,7 @@ L0F46:  LD      A,$7F           ; read port $7FFE - keys B,N,M,.,SPACE.
 ;
 
 ;; DEBOUNCE
-L0F4B:  RES     0,(IY+$3A)      ; update system variable FLAGK
+L0F4B:  LD      (IY+$3A),$00	; clear FLAGK.
         LD      A,$FF           ;
         LD      ($4027),A       ; update system variable DEBOUNCE
         RET                     ; return.
