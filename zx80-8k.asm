@@ -116,7 +116,7 @@ L0020:  CALL    L0049           ; routine CH-ADD+1 gets next immediate
 ; THE 'FLOATING POINT CALCULATOR' RESTART
 ; ---------------------------------------
 ; this restart jumps to the recursive floating-point calculator.
-; the ZX81's internal, FORTH-like, stack-based language.
+; the 8K ZX80's internal, FORTH-like, stack-based language.
 ;
 ; In the five remaining bytes there is, appropriately, enough room for the
 ; end-calc literal - the instruction which exits the calculator.
@@ -156,12 +156,12 @@ L0030:  PUSH    BC              ; push number of spaces on stack.
 ; -----------------------
 ;   The Mode 1 Interrupt routine is concerned solely with generating the central
 ;   television picture.
-;   On the ZX81 interrupts are enabled only during the interrupt routine, 
+;   On the ZX80 interrupts are enabled only during the interrupt routine, 
 ;   although the interrupt 
 ;   This Interrupt Service Routine automatically disables interrupts at the 
 ;   outset and the last interrupt in a cascade exits before the interrupts are
 ;   enabled.
-;   There is no DI instruction in the ZX81 ROM.
+;   There is no DI instruction in the ZX80 8K ROM.
 ;   An maskable interrupt is triggered when bit 6 of the Z80's Refresh register
 ;   changes from set to reset.
 ;   The Z80 will always be executing a HALT (NEWLINE) when the interrupt occurs.
@@ -169,8 +169,6 @@ L0030:  PUSH    BC              ; push number of spaces on stack.
 ;   of the Refresh register are incremented each time as they are when any 
 ;   simple instruction is executed. (The lower 7 bits are incremented twice for
 ;   a prefixed instruction)
-;   This is controlled by the Sinclair Computer Logic Chip - manufactured from 
-;   a Ferranti Uncommitted Logic Array.
 ;
 ;   When a Mode 1 Interrupt occurs the Program Counter, which is the address in
 ;   the upper echo display following the NEWLINE/HALT instruction, goes on the 
@@ -249,8 +247,8 @@ L0045:  POP     DE              ; (10) discard the address after NEWLINE as the
 ; THE 'INCREMENT CH-ADD' SUBROUTINE
 ; ---------------------------------
 ; This is the subroutine that increments the character address system variable
-; and returns if it is not the cursor character. The ZX81 has an actual 
-; character at the cursor position rather than a pointer system variable
+; and returns if it is not the cursor character. The ZX81 and 8K ZX80 have an
+; actual character at the cursor position rather than a pointer system variable
 ; as is the case with prior and subsequent ZX computers.
 
 ;; CH-ADD+1
@@ -2652,7 +2650,7 @@ L0ABF:  CALL    L07EB           ; routine OUT-CODE
 ; THE 'UNSTACK-Z' SUBROUTINE
 ; --------------------------
 ; This subroutine is used to return early from a routine when checking syntax.
-; On the ZX81 the same routines that execute commands also check the syntax
+; On the 8K ZX80 the same routines that execute commands also check the syntax
 ; on line entry. This enables precise placement of the error marker in a line
 ; that fails syntax.
 ; The sequence CALL SYNTAX-Z ; RET Z can be replaced by a call to this routine
@@ -3869,7 +3867,7 @@ L1E45:	LD		H,B
 ; --------------------------
 ; THE 'RAND' COMMAND ROUTINE
 ; --------------------------
-; The keyword was 'RANDOMISE' on the ZX80, is 'RAND' here on the ZX81 and
+; The keyword was 'RANDOMISE' on the 4K ZX80, is 'RAND' here and on the ZX81 and
 ; becomes 'RANDOMIZE' on the ZX Spectrum.
 ; In all invocations the procedure is the same - to set the SEED system variable
 ; with a supplied integer value or to use a time-based value if no number, or
@@ -4221,9 +4219,9 @@ L0F4B:  LD      (IY+$3A),$00	; clear FLAGK.
 ; -------------------------
 ; THE 'SCANNING' SUBROUTINE
 ; -------------------------
-; This recursive routine is where the ZX81 gets its power. Provided there is
-; enough memory it can evaluate an expression of unlimited complexity.
-; Note. there is no unary plus so, as on the ZX80, PRINT +1 gives a syntax error.
+; This recursive routine is where the 8K ZX80 and ZX81 get their power. Provided there
+; is enough memory this can evaluate an expression of unlimited complexity.
+; Note. there is no unary plus so, as on the 4K ZX80, PRINT +1 gives a syntax error.
 ; PRINT +1 works on the Spectrum but so too does PRINT + "STRING".
 
 ;; SCANNING
@@ -5533,7 +5531,7 @@ L13F8:  LD      HL,($401C)      ; load HL from system variable STKEND
 ; THE 'DIM' COMMAND ROUTINE
 ; -------------------------
 ; An array is created and initialized to zeros which is also the space
-; character on the ZX81.
+; character on the 8K ZX80.
 
 ;; DIM
 L1409:  CALL    L111C           ; routine LOOK-VARS
@@ -5868,7 +5866,7 @@ L151D:  LD      C,A             ;
 ; -------------------------
 ; THE 'STACK-BC' SUBROUTINE
 ; -------------------------
-; The ZX81 does not have an integer number format so the BC register contents
+; The 8K ZX80 does not have an integer number format so the BC register contents
 ; must be converted to their full floating-point form.
 ; First two instructions are swapped so that we can skip the PUSH BC and
 ; re-use the rest for STACK-HL.
@@ -5971,7 +5969,7 @@ L154D:  CALL    L1514           ; routine STK-DIGIT
 ; Although no longer operable, the calculator literal was retained for old
 ; times sake, the routine being invoked directly from a machine code CALL.
 ;
-; On entry in the ZX81, m, the exponent, is the 'last value', and the
+; On entry in the 8K ZX80, m, the exponent, is the 'last value', and the
 ; floating-point decimal mantissa is beneath it.
 
 
@@ -7443,8 +7441,8 @@ L1912:  EX      DE,HL           ; restore result pointer from DE.
 ; ------------------------
 ; THE 'TABLE OF CONSTANTS'
 ; ------------------------
-; The ZX81 has only floating-point number representation.
-; Both the ZX80 and the ZX Spectrum have integer numbers in some form.
+; The 8K ZX80 and ZX81 have only floating-point number representation.
+; Both the 4K ZX80 and the ZX Spectrum have integer numbers in some form.
 
 ;; stk-zero                                                 00 00 00 00 00
 L1915:  DEFB    $00             ;;Bytes: 1
@@ -7822,7 +7820,7 @@ L1A27:  DEC     B               ; decrement B counter
 ; -------------------------------
 ; This routine traverses variable-length entries in the table of constants,
 ; stacking intermediate, unwanted constants onto a dummy calculator stack,
-; in the first five bytes of the ZX81 ROM.
+; in the first five bytes of the ZX80 8K ROM.
 
 ;; SKIP-CONS
 L1A2D:  AND     A               ; test if initially zero.
@@ -7918,7 +7916,7 @@ L1A51:  LD      H,D             ; save STKEND - required for result
 ; Offsets $C0 to $DF: 'st-mem-0', 'st-mem-1' etc.
 ; Although 32 memory storage locations can be addressed, only six
 ; $C0 to $C5 are required by the ROM and only the thirty bytes (6*5)
-; required for these are allocated. ZX81 programmers who wish to
+; required for these are allocated. Programmers who wish to
 ; use the floating point routines from assembly language may wish to
 ; alter the system variable MEM to point to 160 bytes of RAM to have
 ; use the full range available.
@@ -7973,8 +7971,8 @@ L1A74:  LD      A,(DE)          ; each byte of second
 ; offset $86: 'series-06'
 ; offset $88: 'series-08'
 ; offset $8C: 'series-0C'
-; The ZX81 uses Chebyshev polynomials to generate approximations for
-; SIN, ATN, LN and EXP. These are named after the Russian mathematician
+; The 8K ZX80 and ZX81 use Chebyshev polynomials to generate approximations
+; for SIN, ATN, LN and EXP. These are named after the Russian mathematician
 ; Pafnuty Chebyshev, born in 1821, who did much pioneering work on numerical
 ; series. As far as calculators are concerned, Chebyshev polynomials have an
 ; advantage over other series, for example the Taylor series, as they can
@@ -8121,9 +8119,9 @@ L1AC2:  JP      L151D           ; exit via STACK-A to put value on the
 ; USR number (29)
 ; ---------------
 ; The USR function followed by a number 0-65535 is the method by which
-; the ZX81 invokes machine code programs. This function returns the
-; contents of the BC register pair.
-; Note. that STACK-BC re-initializes the IY register to $4000 if a user-written
+; the ZX80 invokes machine code programs. This function returns the
+; contents of the HL register pair.
+; Note. that STACK-HL re-initializes the IY register to $4000 if a user-written
 ; program has altered it.
 
 ;; usr-no
@@ -8573,7 +8571,7 @@ L1B85:  LD      HL,($401C)      ; fetch STKEND value from system variable.
 ; ----------------
 ;   This function returns a single character string that is a result of
 ;   converting a number in the range 0-255 to a string e.g. CHR$ 38 = "A".
-;   Note. the ZX81 does not have an ASCII character set.
+;   Note. the ZX80 does not have an ASCII character set.
 
 ;; chrs
 L1B8F:  CALL    L15CD           ; routine FP-TO-A puts the number in A.
@@ -8627,7 +8625,7 @@ L1BA4:  LD      HL,($4016)      ; fetch value of system variable CH_ADD
         EX      DE,HL           ; end of string + 1 to HL
         DEC     HL              ; decrement HL to point to end of new area.
         LD      (HL),$76        ; insert a carriage return at end.
-                                ; ZX81 has a non-ASCII character set
+                                ; ZX80 has a non-ASCII character set
         RES     7,(IY+$01)      ; update FLAGS  - signal checking syntax.
         CALL    L0D92           ; routine CLASS-06 - SCANNING evaluates string
                                 ; expression and checks for integer result.
@@ -8713,7 +8711,7 @@ L1BD5:  LD      BC,$0001        ; create an initial byte in workspace
 ; -------------------
 ; (offset $19: 'code')
 ;   Returns the code of a character or first character of a string
-;   e.g. CODE "AARDVARK" = 38  (not 65 as the ZX81 does not have an ASCII
+;   e.g. CODE "AARDVARK" = 38  (not 65 as the ZX80 does not have an ASCII
 ;   character set).
 
 
@@ -8808,7 +8806,7 @@ L1C2B:  LD      D,A             ; transfer to high byte.
 ; (Offset $00; 'jump-true')
 ;   This enables the calculator to perform conditional relative jumps
 ;   dependent on whether the last test gave a true result
-;   On the ZX81, the exponent will be zero for zero or else $81 for one.
+;   On the 8K ZX80, the exponent will be zero for zero or else $81 for one.
 
 ;; jump-true
 L1C2F:  LD      A,(DE)          ; collect exponent byte
@@ -8977,7 +8975,7 @@ L1CA4:  RST     28H             ;; FP-CALC
 ; THE 'NATURAL LOGARITHM' FUNCTION
 ; --------------------------------
 ; (offset $22: 'ln')
-;   Like the ZX81 itself, 'natural' logarithms came from Scotland.
+;   Like the ZX81, 'natural' logarithms came from Scotland.
 ;   They were devised in 1614 by well-traveled Scotsman John Napier who noted
 ;   "Nothing doth more molest and hinder calculators than the multiplications,
 ;    divisions, square and cubical extractions of great numbers".
@@ -8991,8 +8989,8 @@ L1CA4:  RST     28H             ;; FP-CALC
 ;   of the tables enabling humans to easily scale calculations.
 ;
 ;   It is only recently with the introduction of pocket calculators and
-;   computers like the ZX81 that natural logarithms are once more at the fore,
-;   although some computers retain logarithms to the base ten.
+;   computers like the 8K ZX80 and ZX81 that natural logarithms are once more
+;   at the fore, although some computers retain logarithms to the base ten.
 ;   'Natural' logarithms are powers to the base 'e', which like 'pi' is a 
 ;   naturally occurring number in branches of mathematics.
 ;   Like 'pi' also, 'e' is an irrational number and starts 2.718281828...
@@ -9012,7 +9010,7 @@ L1CA4:  RST     28H             ;; FP-CALC
 ;   To raise a number to the power 3, find its 'ln', multiply by 3 and find the 
 ;   'antiln'.  e.g. PRINT EXP( LN 4 * 3 )  gives 64.
 ;   Similarly to find the n'th root divide the logarithm by 'n'.
-;   The ZX81 ROM used PRINT EXP ( LN 9 / 2 ) to find the square root of the 
+;   The ZX80 8K ROM used PRINT EXP ( LN 9 / 2 ) to find the square root of the 
 ;   number 9. The Napieran square root function is just a special case of 
 ;   the 'to_power' function. A cube root or indeed any root/power would be just
 ;   as simple.
@@ -9563,8 +9561,8 @@ L1DD4:  RST     28H             ;; FP-CALC      x.
 ; (Offset $25: 'sqr')
 ;   Error A if argument is negative.
 ;   This routine is remarkable for its brevity - 7 bytes.
-;   The ZX81 code was originally 9K and various techniques had to be
-;   used to shoe-horn it into an 8K Rom chip.
+;   The ROM code was originally 9K and various techniques had to be
+;   used to shoe-horn it into an 8K ROM chip.
 
 
 ;; sqr
