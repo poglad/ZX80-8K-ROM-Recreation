@@ -3470,7 +3470,7 @@ L0CDE:  RST     18H             ; GET-CHAR
 
         RST     20H             ; NEXT-CHAR advances.
         LD      A,C             ; character to A
-        SUB     $E1             ; subtract 'LPRINT' - lowest command.
+        SUB     $E1             ; subtract 'PLOT' - lowest command.
         JR      C,L0D26         ; forward if less to REPORT-C2
 
         LD      C,A             ; reduced token to C
