@@ -46,6 +46,10 @@ S2		16474	NUSED2	not used
 	MEMBOT moves up from 16477 $405D to 16444 $403C
 	NUSED2 moves up from 16507 $407B to 16474 $405A
 
-
-
+2. PRCC deleted
+	S_POSN_x moves up from 16441 $4039 to 16440 $4038
+	S_POSN_y moves up from 16442 $403A to 16441 $4039
+	CDFLAG moves up from 16443 $403B to 16442 $403A
+	MEMBOT moves up from 16444 $403C to 16443 $403B
+	NUSED2 moves up from 16474 $405A to 16473 $4059
 
