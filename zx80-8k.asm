@@ -1319,10 +1319,8 @@ L03E5:  LD      HL,($4004)      ; fetch system variable RAMTOP.
                                 ; the base of the now empty machine stack.
 
 ; Now set the I register so that the video hardware knows where to find the
-; character set. This ROM only uses the character set when printing to 
-; the ZX Printer. The TV picture is formed by the external video hardware. 
-; Consider also, that this 8K ROM can be retro-fitted to the ZX80 instead of 
-; its original 4K ROM so the video hardware could be on the ZX80.
+; character set. This ROM does not reference the character set directly 
+; at all. The TV picture is formed by the external video hardware.
 
         LD      A,$1E           ; address for this ROM is $1E00.
         LD      I,A             ; set I register from A.
@@ -1946,7 +1944,6 @@ L066C:  LD      ($4029),HL      ; sv NXTLIN_lo
         EX      DE,HL           ;
         CALL    L004D           ; routine TEMP-PTR-2
         CALL    L0CC1           ; routine LINE-RUN
-        RES     1,(IY+$01)      ; sv FLAGS  - Signal printer not in use
         LD      A,$C0           ;
         LD      (IY+$19),A      ; sv X_PTR_lo
         CALL    L14A3           ; routine X-TEMP
@@ -2064,13 +2061,10 @@ L0705:  POP     BC              ;
         RET                     ; return.
 
 ; ---------------------------------------
-; THE 'LIST' AND 'LLIST' COMMAND ROUTINES
+; THE 'LIST' COMMAND ROUTINE
 ; ---------------------------------------
 ;
 ;
-
-;; LLIST
-L072C:  SET     1,(IY+$01)      ; sv FLAGS  - signal printer in use
 
 ;; LIST
 L0730:  CALL    L0EA7           ; routine FIND-INT
@@ -2279,19 +2273,8 @@ L07F1:  RES     0,(IY+$01)      ; update FLAGS - signal leading space permitted
 ;; PRINT-SP
 L07F5:  EXX                     ;
         PUSH    HL              ;
-        BIT     1,(IY+$01)      ; test FLAGS - is printer in use ?
-        JR      NZ,L0802        ; to LPRINT-A
-
         CALL    L0808           ; routine ENTER-CH
-        JR      L0805           ; to PRINT-EXX
-
-; ---
-
-;; LPRINT-A
-L0802:  CALL    L0851           ; routine LPRINT-CH
-
-;; PRINT-EXX
-L0805:  POP     HL              ;
+        POP     HL              ;
         EXX                     ;
         RET                     ;
 
@@ -2356,230 +2339,6 @@ L0847:  LD      C,$21           ;
         SET     0,(IY+$01)      ; sv FLAGS  - Suppress leading space
         JP      L0918           ; to LOC-ADDR
 
-; --------------------------
-; THE 'LPRINT-CH' SUBROUTINE
-; --------------------------
-; This routine sends a character to the ZX-Printer placing the code for the
-; character in the Printer Buffer.
-; Note. PR-CC contains the low byte of the buffer address. The high order byte 
-; is always constant. 
-
-
-;; LPRINT-CH
-L0851:  CP      $76             ; compare to NEWLINE.
-        JR      Z,L0871         ; forward if so to COPY-BUFF
-
-        LD      C,A             ; take a copy of the character in C.
-        LD      A,($4038)       ; fetch print location from PR_CC
-        AND     $7F             ; ignore bit 7 to form true position.
-        CP      $5C             ; compare to 33rd location
-
-        LD      L,A             ; form low-order byte.
-        LD      H,$40           ; the high-order byte is fixed.
-
-        CALL    Z,L0871         ; routine COPY-BUFF to send full buffer to 
-                                ; the printer if first 32 bytes full.
-                                ; (this will reset HL to start.)
-
-        LD      (HL),C          ; place character at location.
-        INC     L               ; increment - will not cross a 256 boundary.
-        LD      (IY+$38),L      ; update system variable PR_CC
-                                ; automatically resetting bit 7 to show that
-                                ; the buffer is not empty.
-        RET                     ; return.
-
-; --------------------------
-; THE 'COPY' COMMAND ROUTINE
-; --------------------------
-; The full character-mapped screen is copied to the ZX-Printer.
-; All twenty-four text/graphic lines are printed.
-
-;; COPY
-L0869:  LD      D,$16           ; prepare to copy twenty four text lines.
-        LD      HL,($400C)      ; set HL to start of display file from D_FILE.
-        INC     HL              ; 
-        JR      L0876           ; forward to COPY*D
-
-; ---
-
-; A single character-mapped printer buffer is copied to the ZX-Printer.
-
-;; COPY-BUFF
-L0871:  LD      D,$01           ; prepare to copy a single text line.
-        LD      HL,$403C        ; set HL to start of printer buffer PRBUFF.
-
-; both paths converge here.
-
-;; COPY*D
-L0876:  CALL    L02E7           ; routine SET-FAST
-
-        PUSH    BC              ; *** preserve BC throughout.
-                                ; a pending character may be present 
-                                ; in C from LPRINT-CH
-
-;; COPY-LOOP
-L087A:  PUSH    HL              ; save first character of line pointer. (*)
-        XOR     A               ; clear accumulator.
-        LD      E,A             ; set pixel line count, range 0-7, to zero.
-
-; this inner loop deals with each horizontal pixel line.
-
-;; COPY-TIME
-L087D:  OUT     ($FB),A         ; bit 2 reset starts the printer motor
-                                ; with an inactive stylus - bit 7 reset.
-        POP     HL              ; pick up first character of line pointer (*)
-                                ; on inner loop.
-
-;; COPY-BRK
-L0880:  CALL    L0F46           ; routine BREAK-1
-        JR      C,L088A         ; forward with no keypress to COPY-CONT
-
-; else A will hold 11111111 0
-
-        RRA                     ; 0111 1111
-        OUT     ($FB),A         ; stop ZX printer motor, de-activate stylus.
-
-;; REPORT-D2
-L0888:  RST     08H             ; ERROR-1
-        DEFB    $0C             ; Error Report: BREAK - CONT repeats
-
-; ---
-
-;; COPY-CONT
-L088A:  IN      A,($FB)         ; read from printer port.
-        ADD     A,A             ; test bit 6 and 7
-        JP      M,L08DE         ; jump forward with no printer to COPY-END
-
-        JR      NC,L0880        ; back if stylus not in position to COPY-BRK
-
-        PUSH    HL              ; save first character of line pointer (*)
-        PUSH    DE              ; ** preserve character line and pixel line.
-
-        LD      A,D             ; text line count to A?
-        CP      $02             ; sets carry if last line.
-        SBC     A,A             ; now $FF if last line else zero.
-
-; now cleverly prepare a printer control mask setting bit 2 (later moved to 1)
-; of D to slow printer for the last two pixel lines ( E = 6 and 7)
-
-        AND     E               ; and with pixel line offset 0-7
-        RLCA                    ; shift to left.
-        AND     E               ; and again.
-        LD      D,A             ; store control mask in D.
-
-;; COPY-NEXT
-L089C:  LD      C,(HL)          ; load character from screen or buffer.
-        LD      A,C             ; save a copy in C for later inverse test.
-        INC     HL              ; update pointer for next time.
-        CP      $76             ; is character a NEWLINE ?
-        JR      Z,L08C7         ; forward, if so, to COPY-N/L
-
-        PUSH    HL              ; * else preserve the character pointer.
-
-        SLA     A               ; (?) multiply by two
-        ADD     A,A             ; multiply by four
-        ADD     A,A             ; multiply by eight
-
-        LD      H,$0F           ; load H with half the address of character set.
-        RL      H               ; now $1E or $1F (with carry)
-        ADD     A,E             ; add byte offset 0-7
-        LD      L,A             ; now HL addresses character source byte
-
-        RL      C               ; test character, setting carry if inverse.
-        SBC     A,A             ; accumulator now $00 if normal, $FF if inverse.
-
-        XOR     (HL)            ; combine with bit pattern at end or ROM.
-        LD      C,A             ; transfer the byte to C.
-        LD      B,$08           ; count eight bits to output.
-
-;; COPY-BITS
-L08B5:  LD      A,D             ; fetch speed control mask from D.
-        RLC     C               ; rotate a bit from output byte to carry.
-        RRA                     ; pick up in bit 7, speed bit to bit 1
-        LD      H,A             ; store aligned mask in H register.
-
-;; COPY-WAIT
-L08BA:  IN      A,($FB)         ; read the printer port
-        RRA                     ; test for alignment signal from encoder.
-        JR      NC,L08BA        ; loop if not present to COPY-WAIT
-
-        LD      A,H             ; control byte to A.
-        OUT     ($FB),A         ; and output to printer port.
-        DJNZ    L08B5           ; loop for all eight bits to COPY-BITS
-
-        POP     HL              ; * restore character pointer.
-        JR      L089C           ; back for adjacent character line to COPY-NEXT
-
-; ---
-
-; A NEWLINE has been encountered either following a text line or as the 
-; first character of the screen or printer line.
-
-;; COPY-N/L
-L08C7:  IN      A,($FB)         ; read printer port.
-        RRA                     ; wait for encoder signal.
-        JR      NC,L08C7        ; loop back if not to COPY-N/L
-
-        LD      A,D             ; transfer speed mask to A.
-        RRCA                    ; rotate speed bit to bit 1. 
-                                ; bit 7, stylus control is reset.
-        OUT     ($FB),A         ; set the printer speed.
-
-        POP     DE              ; ** restore character line and pixel line.
-        INC     E               ; increment pixel line 0-7.
-        BIT     3,E             ; test if value eight reached.
-        JR      Z,L087D         ; back if not to COPY-TIME
-
-; eight pixel lines, a text line have been completed.
-
-        POP     BC              ; lose the now redundant first character 
-                                ; pointer
-        DEC     D               ; decrease text line count.
-        JR      NZ,L087A        ; back if not zero to COPY-LOOP
-
-        LD      A,$04           ; stop the already slowed printer motor.
-        OUT     ($FB),A         ; output to printer port.
-
-;; COPY-END
-L08DE:  CALL    L0207           ; routine SLOW/FAST
-        POP     BC              ; *** restore preserved BC.
-
-; -------------------------------------
-; THE 'CLEAR PRINTER BUFFER' SUBROUTINE
-; -------------------------------------
-; This subroutine sets 32 bytes of the printer buffer to zero (space) and
-; the 33rd character is set to a NEWLINE.
-; This occurs after the printer buffer is sent to the printer but in addition
-; after the 24 lines of the screen are sent to the printer. 
-; Note. This is a logic error as the last operation does not involve the 
-; buffer at all. Logically one should be able to use 
-; 10 LPRINT "HELLO ";
-; 20 COPY
-; 30 LPRINT ; "WORLD"
-; and expect to see the entire greeting emerge from the printer.
-; Surprisingly this logic error was never discovered and although one can argue
-; if the above is a bug, the repetition of this error on the Spectrum was most
-; definitely a bug.
-; Since the printer buffer is fixed at the end of the system variables, and
-; the print position is in the range $3C - $5C, then bit 7 of the system
-; variable is set to show the buffer is empty and automatically reset when
-; the variable is updated with any print position - neat.
-
-;; CLEAR-PRB
-L08E2:  LD      HL,$405C        ; address fixed end of PRBUFF
-        LD      (HL),$76        ; place a newline at last position.
-        LD      B,$20           ; prepare to blank 32 preceding characters. 
-
-;; PRB-BYTES
-L08E9:  DEC     HL              ; decrement address - could be DEC L.
-        LD      (HL),$00        ; place a zero byte.
-        DJNZ    L08E9           ; loop for all thirty-two to PRB-BYTES
-
-        LD      A,L             ; fetch character print position.
-        SET     7,A             ; signal the printer buffer is clear.
-        LD      ($4038),A       ; update one-byte system variable PR_CC
-        RET                     ; return.
-
 ; -------------------------
 ; THE 'PRINT AT' SUBROUTINE
 ; -------------------------
@@ -2605,15 +2364,6 @@ L0905:  JP      C,L0EAD         ; to REPORT-B
 
         ADD     A,$02           ;
         LD      C,A             ;
-
-;; SET-FIELD
-L090B:  BIT     1,(IY+$01)      ; sv FLAGS  - Is printer in use
-        JR      Z,L0918         ; to LOC-ADDR
-
-        LD      A,$5D           ;
-        SUB     C               ;
-        LD      ($4038),A       ; sv PR_CC
-        RET                     ;
 
 ; ----------------------------
 ; THE 'LOCATE ADDRESS' ROUTINE
@@ -2953,8 +2703,7 @@ L0A1F:  LD      B,(IY+$22)      ; sv DF_SZ
 L0A2A:  LD      B,$18           ;
 
 ;; B-LINES
-L0A2C:  RES     1,(IY+$01)      ; sv FLAGS  - Signal printer not in use
-        LD      C,$21           ;
+L0A2C:  LD      C,$21           ;
         PUSH    BC              ;
         CALL    L0918           ; routine LOC-ADDR
         POP     BC              ;
@@ -3107,15 +2856,6 @@ L0AC5:  CALL    L0DA6           ; routine SYNTAX-Z resets the ZERO flag if
         JP      (HL)            ; else jump to the continuation address in
                                 ; the calling routine as RET would have done.
 
-; ----------------------------
-; THE 'LPRINT' COMMAND ROUTINE
-; ----------------------------
-;
-;
-
-;; LPRINT
-L0ACB:  SET     1,(IY+$01)      ; sv FLAGS  - Signal printer in use
-
 ; ---------------------------
 ; THE 'PRINT' COMMAND ROUTINE
 ; ---------------------------
@@ -3169,13 +2909,6 @@ L0AFA:  CP      $A8             ;
 
         AND     $1F             ;
         LD      C,A             ;
-        BIT     1,(IY+$01)      ; sv FLAGS  - Is printer in use
-        JR      Z,L0B1E         ; to TAB-TEST
-
-        SUB     (IY+$38)        ; sv PR_CC
-        SET     7,A             ;
-        ADD     A,$3C           ;
-        CALL    NC,L0871        ; routine COPY-BUFF
 
 ;; TAB-TEST
 L0B1E:  ADD     A,(IY+$39)      ; sv S_POSN_x
@@ -3281,11 +3014,6 @@ L0B8B:  CALL    L0AC5           ; routine UNSTACK-Z
         RST     10H             ; PRINT-A
         LD      BC,($4039)      ; sv S_POSN_x
         LD      A,C             ;
-        BIT     1,(IY+$01)      ; sv FLAGS  - Is printer in use
-        JR      Z,L0BA4         ; to CENTRE
-
-        LD      A,$5D           ;
-        SUB     (IY+$38)        ; sv PR_CC
 
 ;; CENTRE
 L0BA4:  LD      C,$11           ;
@@ -3612,20 +3340,6 @@ L0CAB:  DEFB    $00             ; Class-00 - No further operands.
 ;; P-FAST
 L0CAE:  DEFB    $00             ; Class-00 - No further operands.
         DEFW    L0F23           ; Address: $0F23; Address: FAST
-
-;; P-COPY
-L0CB1:  DEFB    $00             ; Class-00 - No further operands.
-        DEFW    L0869           ; Address: $0869; Address: COPY
-
-;; P-LPRINT
-L0CB4:  DEFB    $05             ; Class-05 - Variable syntax checked entirely
-                                ; by routine.
-        DEFW    L0ACB           ; Address: $0ACB; Address: LPRINT
-
-;; P-LLIST
-L0CB7:  DEFB    $03             ; Class-03 - A numeric expression may follow
-                                ; else default to zero.
-        DEFW    L072C           ; Address: $072C; Address: LLIST
 
 
 ; ---------------------------
