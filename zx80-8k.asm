@@ -659,7 +659,7 @@ L01FC:  INC     HL              ;
 ;
 
 ;; SLOW/FAST
-L0207:  LD      HL,$403A        ; Address the system variable CDFLAG.
+L0207:  LD      HL,$403B        ; Address the system variable CDFLAG.
         LD      A,(HL)          ; Load value to the accumulator.
         RLA                     ; rotate bit 6 to position 7.
         XOR     (HL)            ; exclusive or with original bit 7.
@@ -765,7 +765,7 @@ L023E:  CALL    L02BB           ; routine KEYBOARD gets the key row in H and
         LD      E,B             ; transfer the column value to E
         LD      B,$0B           ; and load B with eleven 
 
-        LD      HL,$403A        ; address system variable CDFLAG
+        LD      HL,$403B        ; address system variable CDFLAG
         RES     0,(HL)          ; reset the rightmost bit of CDFLAG
         JR      NZ,L0264        ; skip forward if debounce/diff >0 to NO-KEY
 
@@ -845,7 +845,7 @@ L0292:  POP     IX              ; pop the return address to IX register.
                                 ; will be either L0281 or L028F - see above.
 
         LD      C,(IY+$28)      ; load C with value of system constant MARGIN.
-        BIT     7,(IY+$3A)      ; test CDFLAG for compute and display.
+        BIT     7,(IY+$3B)      ; test CDFLAG for compute and display.
         JR      Z,L02A9         ; forward, with FAST mode, to DISPLAY-4
 
         LD      A,C             ; move MARGIN to A  - 31d or 55d.
@@ -980,12 +980,12 @@ L02C5:  OR      $E0             ; [7] OR %11100000
 ;
 
 ;; SET-FAST
-L02E7:  BIT     7,(IY+$3A)      ; sv CDFLAG
+L02E7:  BIT     7,(IY+$3B)      ; sv CDFLAG
         RET     Z               ;
 
         HALT                    ; Wait for Interrupt
         OUT     ($FD),A         ;
-        RES     7,(IY+$3A)      ; sv CDFLAG
+        RES     7,(IY+$3B)      ; sv CDFLAG
         RET                     ; return.
 
 
@@ -1328,7 +1328,7 @@ L03E5:  LD      HL,($4004)      ; fetch system variable RAMTOP.
 
         LD      IY,$4000        ; set IY to the start of RAM so that the 
                                 ; system variables can be indexed.
-        LD      (IY+$3A),$40    ; set CDFLAG 0100 0000. Bit 6 indicates 
+        LD      (IY+$3B),$40    ; set CDFLAG 0100 0000. Bit 6 indicates 
                                 ; Compute nad Display required.
 
         LD      HL,$407D        ; The first location after System Variables -
@@ -1503,7 +1503,7 @@ L04B1:  DEC     HL              ;
 L04C1:  LD      HL,$0000        ;
         LD      ($4018),HL      ; sv X_PTR_lo
 
-        LD      HL,$403A        ; system variable CDFLAG
+        LD      HL,$403B        ; system variable CDFLAG
         BIT     7,(HL)          ;
 
         CALL    Z,L0229         ; routine DISPLAY-1
@@ -1817,7 +1817,7 @@ L05C4:  CALL    L0A1F           ; routine LINE-ENDS clears lower display.
 ; line numbers to the edit line.
 
         LD      HL,$1821        ; prepare line 0, column 0.
-        LD      ($4038),HL      ; update S_POSN with these dummy values.
+        LD      ($4039),HL      ; update S_POSN with these dummy values.
 
         LD      HL,($400A)      ; fetch current line from E_PPC may be a 
                                 ; non-existent line e.g. last line deleted.
@@ -2282,7 +2282,7 @@ L07F5:  EXX                     ;
 
 ;; ENTER-CH
 L0808:  LD      D,A             ;
-        LD      BC,($4038)      ; sv S_POSN_x
+        LD      BC,($4039)      ; sv S_POSN_x
         LD      A,C             ;
         CP      $21             ;
         JR      Z,L082C         ; to TEST-LOW
@@ -2304,7 +2304,7 @@ L0812:  LD      A,$76           ;
         LD       ($400E),HL     ; sv DF_CC_lo
         LD      C,$21           ;
         DEC     B               ;
-        LD      ($4038),BC      ; sv S_POSN_x
+        LD      ($4039),BC      ; sv S_POSN_x
 
 ;; TEST-LOW
 L082C:  LD      A,B             ;
@@ -2328,7 +2328,7 @@ L083A:  CALL    L099B           ; routine ONE-SPACE
 L083E:  LD      (HL),A          ;
         INC     HL              ;
         LD      ($400E),HL      ; sv DF_CC_lo
-        DEC     (IY+$38)        ; sv S_POSN_x
+        DEC     (IY+$39)        ; sv S_POSN_x
         RET                     ;
 
 ; ---
@@ -2372,7 +2372,7 @@ L0905:  JP      C,L0EAD         ; to REPORT-B
 ;
 
 ;; LOC-ADDR
-L0918:  LD      ($4038),BC      ; sv S_POSN_x
+L0918:  LD      ($4039),BC      ; sv S_POSN_x
         LD      HL,($4010)      ; sv VARS_lo
         LD      D,C             ;
         LD      A,$22           ;
@@ -2711,12 +2711,12 @@ L0A2C:  LD      C,$21           ;
         CP      $4D             ;
         JR      C,L0A52         ; to COLLAPSED
 
-        SET     7,(IY+$39)      ; sv S_POSN_y
+        SET     7,(IY+$3A)      ; sv S_POSN_y
 
 ;; CLEAR-LOC
 L0A42:  XOR     A               ; prepare a space
         CALL    L07F5           ; routine PRINT-SP prints a space
-        LD      HL,($4038)      ; sv S_POSN_x
+        LD      HL,($4039)      ; sv S_POSN_x
         LD      A,L             ;
         OR      H               ;
         AND     $7E             ;
@@ -2776,7 +2776,7 @@ L0A73:  LD      HL,($4014)      ; sv E_LINE_lo
         BIT     5,(IY+$2D)      ; sv FLAGX
         RET     NZ              ;
 
-        LD      HL,$403B        ; sv MEM-0-1st
+        LD      HL,$403C        ; sv MEM-0-1st
         LD      ($401C),HL      ; sv STKEND_lo
         CALL    L1548           ; routine INT-TO-FP
         CALL    L158A           ; routine FP-TO-BC
@@ -2911,9 +2911,9 @@ L0AFA:  CP      $A8             ;
         LD      C,A             ;
 
 ;; TAB-TEST
-L0B1E:  ADD     A,(IY+$38)      ; sv S_POSN_x
+L0B1E:  ADD     A,(IY+$39)      ; sv S_POSN_x
         CP      $21             ;
-        LD      A,($4039)       ; sv S_POSN_y
+        LD      A,($403A)       ; sv S_POSN_y
         SBC     A,$01           ;
         CALL    L08FA           ; routine TEST-VAL
         SET     0,(IY+$01)      ; sv FLAGS  - Suppress leading space
@@ -3012,7 +3012,7 @@ L0B8B:  CALL    L0AC5           ; routine UNSTACK-Z
         XOR     A               ;
 
         RST     10H             ; PRINT-A
-        LD      BC,($4038)      ; sv S_POSN_x
+        LD      BC,($4039)      ; sv S_POSN_x
         LD      A,C             ;
 
 ;; CENTRE
@@ -3144,7 +3144,7 @@ L0C0E:  LD      B,(IY+$22)      ; sv DF_SZ
         CALL    L099B           ; routine ONE-SPACE
         LD      A,(HL)          ;
         LD      (DE),A          ;
-        INC     (IY+$39)        ; sv S_POSN_y
+        INC     (IY+$3A)        ; sv S_POSN_y
         LD      HL,($400C)      ; sv D_FILE_lo
         INC     HL              ;
         LD      D,H             ;
@@ -4077,7 +4077,7 @@ L0F05:  OR      (HL)            ;
 ;; ENTER-CUR
 L0F14:  DEC     HL              ;
         LD      (HL),$7F        ;
-        LD      HL,($4038)      ; sv S_POSN_x
+        LD      HL,($4039)      ; sv S_POSN_x
         LD      ($4030),HL      ; sv T_ADDR_lo
         POP     HL              ;
         JP      L0472           ; to LOWER
@@ -4096,7 +4096,7 @@ L0F21:  RST     08H             ; ERROR-1
 
 ;; FAST
 L0F23:  CALL    L02E7           ; routine SET-FAST
-        RES     6,(IY+$3A)      ; sv CDFLAG
+        RES     6,(IY+$3B)      ; sv CDFLAG
         RET                     ; return.
 
 ; --------------------------
@@ -4106,7 +4106,7 @@ L0F23:  CALL    L02E7           ; routine SET-FAST
 ;
 
 ;; SLOW
-L0F2B:  SET     6,(IY+$3A)      ; sv CDFLAG
+L0F2B:  SET     6,(IY+$3B)      ; sv CDFLAG
         JP      L0207           ; to SLOW/FAST
 
 ; ---------------------------
@@ -4143,7 +4143,7 @@ L0F46:  LD      A,$7F           ; read port $7FFE - keys B,N,M,.,SPACE.
 ;
 
 ;; DEBOUNCE
-L0F4B:  RES     0,(IY+$3A)      ; update system variable CDFLAG
+L0F4B:  RES     0,(IY+$3B)      ; update system variable CDFLAG
         LD      A,$FF           ;
         LD      ($4027),A       ; update system variable DEBOUNCE
         RET                     ; return.
@@ -5649,7 +5649,7 @@ L14AD:  LD      HL,($4014)      ; fetch start of edit line from E_LINE
 ;
 
 ;; SET-MIN
-L14BC:  LD      HL,$403B        ; normal location of calculator's memory area
+L14BC:  LD      HL,$403C        ; normal location of calculator's memory area
         LD      ($401F),HL      ; update system variable MEM
         LD      HL,($401A)      ; fetch STKBOT
         JR      L14A9           ; back to SET-STK-E
@@ -5729,7 +5729,7 @@ L14E5:  RST     20H             ; NEXT-CHAR
 L14F5:  CP      $2A             ; is character 'E' ?
         RET     NZ              ; return if not
 
-        LD      (IY+$3B),$FF    ; initialize sv MEM-0-1st to $FF TRUE
+        LD      (IY+$3C),$FF    ; initialize sv MEM-0-1st to $FF TRUE
 
         RST     20H             ; NEXT-CHAR
         CP      $15             ; is character a '+' ?
@@ -5738,7 +5738,7 @@ L14F5:  CP      $2A             ; is character 'E' ?
         CP      $16             ; is it a '-' ?
         JR      NZ,L1509        ; forward if not to ST-E-PART
 
-        INC     (IY+$3B)        ; sv MEM-0-1st change to FALSE
+        INC     (IY+$3C)        ; sv MEM-0-1st change to FALSE
 
 ;; SIGN-DONE
 L1508:  RST     20H             ; NEXT-CHAR
@@ -8568,12 +8568,12 @@ L1BD5:  LD      BC,$0001        ; create an initial byte in workspace
 
         LD      (HL),$76        ; place a carriage return there.
 
-        LD      HL,($4038)      ; fetch value of S_POSN column/line
+        LD      HL,($4039)      ; fetch value of S_POSN column/line
         PUSH    HL              ; and preserve on stack.
 
         LD      L,$FF           ; make column value high to create a
                                 ; contrived buffer of length 254.
-        LD      ($4038),HL      ; and store in system variable S_POSN.
+        LD      ($4039),HL      ; and store in system variable S_POSN.
 
         LD      HL,($400E)      ; fetch value of DF_CC
         PUSH    HL              ; and preserve on stack also.
@@ -8598,7 +8598,7 @@ L1BD5:  LD      BC,$0001        ; create an initial byte in workspace
         LD      ($400E),HL      ; DF_CC value
 
         POP     HL              ; restore original
-        LD      ($4038),HL      ; S_POSN values.
+        LD      ($4039),HL      ; S_POSN values.
 
         CALL    L12C3           ; routine STK-STO-$ stores the string
                                 ; descriptor on the calculator stack.
