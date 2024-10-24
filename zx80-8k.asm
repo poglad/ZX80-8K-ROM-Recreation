@@ -5833,6 +5833,15 @@ L1511:  DEFB    $38             ;;e-to-fp               x.
 
         RET                     ; return.
 
+; -------------------------
+; THE 'STACK-HL' SUBROUTINE
+; -------------------------
+; The ZX80 sometimes uses STACK-HL instead of STACK-BC, so just adapt the STACK-BC routine.
+
+;; STACK-HL
+STACK_HL:
+		PUSH	HL
+		JR		L1520+$01
 
 ; --------------------------
 ; THE 'STK-DIGIT' SUBROUTINE
@@ -5854,7 +5863,6 @@ L1514:  CP      $1C             ;
 ; ------------------------
 ;
 
-
 ;; STACK-A
 L151D:  LD      C,A             ;
         LD      B,$00           ;
@@ -5864,10 +5872,12 @@ L151D:  LD      C,A             ;
 ; -------------------------
 ; The ZX81 does not have an integer number format so the BC register contents
 ; must be converted to their full floating-point form.
+; First two instructions are swapped so that we can skip the PUSH BC and
+; re-use the rest for STACK-HL.
 
 ;; STACK-BC
-L1520:  LD      IY,$4000        ; re-initialize the system variables pointer.
-        PUSH    BC              ; save the integer value.
+L1520:  PUSH    BC              ; save the integer value.
+        LD      IY,$4000        ; re-initialize the system variables pointer.
 
 ; now stack zero, five zero bytes as a starting point.
 
