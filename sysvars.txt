@@ -39,7 +39,8 @@ SX1		16441	S_POSN	Column number for PRINT position.
 SX1		16442			Line number for PRINT position.
 S1		16443	CDFLAG	Various flags. Bit 7 is on (1) during compute & display mode.
 SN30	16444	MEMBOT	Calculator's memory area; used to store numbers that cannot conveniently be put on the calculator stack.
-S2		16474	NUSED2	not used	
+S1		16473	DATADD	Data address (READ, RESTORE, DATA).
+S1		16474	NUSED2	not used	
 
 1. PRBUFF deleted
 	MEMBOT moves up from 16477 $405D to 16444 $403C
@@ -52,3 +53,5 @@ S2		16474	NUSED2	not used
 	MEMBOT moves up from 16444 $403C to 16443 $403B
 	NUSED2 moves up from 16474 $405A to 16473 $4059
 
+3. DATADD introduced at 16473 $4049
+	NUSED2 moves up by 1 byte, becomes 1 byte long

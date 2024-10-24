@@ -3895,6 +3895,138 @@ L0E69:  DEFB    $34             ;;end-calc
         SCF                     ; set carry flag
         RET                     ; return.
 
+; -------------------
+; Handle READ command
+; -------------------
+; e.g. READ a, b$, c$(1000 TO 3000)
+; A list of comma-separated variables is assigned from a list of
+; comma-separated expressions.
+; As it moves along the first list, the character address CH_ADD is stored
+; in X_PTR while CH_ADD is used to read the second list.
+
+;; READ-3
+L1DEC:  RST     20H             ; NEXT-CHAR
+
+; -> Entry point.
+;; READ
+
+L1DED:	CALL	L0D3C			; routine CLASS-01 checks variable.
+		CALL    L0DA6           ; routine SYNTAX-Z
+        JR      Z,L1E1E         ; forward to READ-2 if checking syntax
+
+        RST     18H             ; GET-CHAR
+        LD      ($4018),HL      ; save character position in X_PTR.
+
+        LD      HL,($4059)      ; load HL with Data Address DATADD, which is
+                                ; the start of the program or the address
+                                ; after the last expression that was read
+        LD      A,(HL)          ; fetch character
+        CP      $1A             ; is it a comma ?
+        JR      Z,L1E0A         ; forward to READ-1 if so.
+
+; else all data in this line has been read so look for next DATA token
+		
+;; LOOK-P-1:
+LP1:	INC		HL
+		LD      A,(HL)          ; fetch high byte of line number.
+
+        AND     $C0             ; mask off low bits $3F
+
+        JR      NZ,L1E08        ; forward at end of program to REPORT-E
+
+        INC     HL              ; step past high byte
+        INC     HL              ; step past low byte
+
+        LD      C,(HL)          ; low byte of line length to C.
+        INC     HL              ;
+        LD      B,(HL)          ; high byte to B.
+
+        PUSH    HL              ; save address
+        ADD     HL,BC           ; add length to position.
+        LD      B,H             ; and save result
+        LD      C,L             ; in BC.
+        POP     HL              ; restore address.
+
+L1DA3:  PUSH    BC              ; save address of next line
+
+        CALL    L004C           ; routine TEMP-PTR1 sets CH_ADD
+        RST     18H             ; GET-CHAR
+
+        POP     BC              ; restore address.
+
+        CP      $FF             ; compare to 'DATA'.
+        JR      Z,L1E0A         ; if match was found. ->
+
+		LD		H,B
+		LD		L,C
+        JR      LP1          	; back to LOOK-P-1 for next line.		
+
+;; REPORT-E
+L1E08:  RST     08H             ; ERROR-1
+        DEFB    $0D             ; Error Report: Out of DATA
+
+;; READ-1
+L1E0A:  CALL    L004C           ; routine TEMP-PTR1 advances updating CH_ADD
+                                ; with new DATADD position.
+        CALL    L0D6C           ; routine assigns value to variable
+                                ; checking type match and adjusting CH_ADD.
+
+        RST     18H             ; GET-CHAR fetches adjusted character position
+        LD      ($4059),HL      ; store back in DATADD
+        LD      HL,($4018)      ; fetch X_PTR  the original READ CH_ADD
+        LD      (IY+$19),$00    ; now nullify X_PTR_hi
+        CALL    L004D           ; routine TEMP-PTR2 restores READ CH_ADD
+
+;; READ-2
+L1E1E:  RST     18H             ; GET-CHAR
+        CP      $1A             ; is it ',' indicating more variables to read ?
+        JR      Z,L1DEC         ; back to READ-3 if so
+
+		CALL    L0D1D           ; routine CHECK-END
+        RET                     ; return from here in runtime to STMT-RET.
+
+; -------------------
+; Handle DATA command
+; -------------------
+; In runtime this 'command' is passed by but the syntax is checked when such
+; a statement is found while parsing a line.
+; e.g. DATA 1, 2, "text", score-1, a$(location, room, object), FN r(49),
+;         wages - tax, TRUE, The meaning of life
+
+;; DATA
+L1E27:  CALL    L0DA6           ; routine SYNTAX-Z
+        RET		NZ				; nothing to do if in runtime
+
+;; DATA-1
+L1E2C:  CALL    L0F55           ; routine SCANNING to check syntax of
+                                ; expression
+        CP      $1A             ; is it a comma ?
+        CALL    NZ,L0D1D        ; routine CHECK-END checks that statement
+                                ; is complete. Will make an early exit if
+                                ; so. >>>
+        RST     20H             ; NEXT-CHAR
+        JR      L1E2C           ; back to DATA-1
+
+; ---
+
+;; RESTORE
+L1E42:  CALL    L0EA7           ; routine FIND-INT puts integer in BC.
+
+; this entry point is used from RUN command with BC holding zero
+
+;; REST-RUN
+L1E45:	LD		H,B
+		LD		L,C
+
+        LD      A,H             ;	this should be here but is missing in Spectrum!
+        CP      $F0             ;
+        JR      NC,L0EAD        ; to REPORT-B
+
+        CALL    L09D8           ; routine LINE-ADDR
+		DEC		HL
+        LD      ($4059),HL      ; update system variable DATADD.
+        RET                     ; return.
+
 ; --------------------------
 ; THE 'RAND' COMMAND ROUTINE
 ; --------------------------
