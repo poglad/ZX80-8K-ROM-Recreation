@@ -1377,7 +1377,7 @@ L04F7:  LD      A,(HL)          ;
         SET     7,A             ;
         JR      C,L051B         ; to ENTER
 
-        LD      HL,$00C7        ; (expr reqd)
+        LD      HL,L00CC-$05    ; (expr reqd)
 
 ;; TABLE-ADD
 L0505:  ADD     HL,DE           ;
@@ -1433,7 +1433,7 @@ L052B:  LD      A,$78           ;
 
 ;; KEY-SORT
 L052D:  LD      E,A             ;
-        LD      HL,$0482        ; base address of ED-KEYS (exp reqd)
+        LD      HL,L0562-$E0    ; base address of ED-KEYS (exp reqd)
         ADD     HL,DE           ;
         ADD     HL,DE           ;
         LD      C,(HL)          ;
@@ -2037,7 +2037,7 @@ L07C7:  ADD     A,L             ;
         LD      L,$01           ;
         JR      NZ,L07C7        ; to KEY-LINE
 
-        LD      HL,$007D        ; (expr reqd)
+        LD      HL,L007E-$01    ; (expr reqd)
         LD      E,A             ;
         ADD     HL,DE           ;
         SCF                     ; Set Carry Flag
