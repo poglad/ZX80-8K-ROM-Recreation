@@ -1895,11 +1895,7 @@ L060C:  CALL    L0A1F           ; routine LINE-ENDS
         JR      NZ,L0629        ; to NOW-SCAN
 
         LD      HL,($4014)      ; sv E_LINE_lo
-        LD      A,(HL)          ;
-        CP      $FF             ;
-        JR      Z,L0626         ; to STK-UPPER
 
-        CALL    L08E2           ; routine CLEAR-PRB
         CALL    L0A2A           ; routine CLS
 
 ;; STK-UPPER
