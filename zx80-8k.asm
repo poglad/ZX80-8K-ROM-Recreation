@@ -9645,12 +9645,23 @@ L1DFD:  DEFB    $34             ;;end-calc              last value 1 or 0.
 
         RET                     ; return.
 
+; --------------
+; ROM IDENTIFIER		
+; --------------
+
+	DEFB	$35,$39,$20,$14		; PT 2014
+
 ; ---------------------
 ; THE 'SPARE LOCATIONS'
 ; ---------------------
 
 ;; SPARE
-L1DFF:  DEFB    $FF             ; That's all folks.
+	DEFB	$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF	; unused locations.
+	DEFB	$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF	; unused locations.
+	DEFB	$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF	; unused locations.
+	DEFB	$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF	; unused locations.
+	DEFB	$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF ; unused locations.
+	DEFB    $FF ; That's all folks.
 
 #ifdef FONT_ZX80	
 
