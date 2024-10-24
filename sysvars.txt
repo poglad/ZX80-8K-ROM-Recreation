@@ -35,7 +35,6 @@ S2		16434	SEED	The seed for RND. This is the variable that is set by RAND.
 S2		16436	FRAMES	Counts the frames displayed on the television. Bit 15 is 1. Bits 0 to 14 are decremented for each frame set to the television. This can be used for timing, but PAUSE also uses it. PAUSE resets to 0 bit 15, & puts in bits 0 to 14 the length of the pause. When these have been counted down to zero, the pause stops. If the pause stops because of a key depression, bit 15 is set to 1 again.
 S1		16438	COORDS	x-coordinate of last point PLOTted.
 S1		16439			y-coordinate of last point PLOTted.
-S1		16440	PR_CC	Less significant byte of address of next position for LPRINT to print as (in PRBUFF).
 SX1		16441	S_POSN	Column number for PRINT position.
 SX1		16442			Line number for PRINT position.
 S1		16443	CDFLAG	Various flags. Bit 7 is on (1) during compute & display mode.
@@ -46,6 +45,10 @@ S2		16474	NUSED2	not used
 	MEMBOT moves up from 16477 $405D to 16444 $403C
 	NUSED2 moves up from 16507 $407B to 16474 $405A
 
-
-
+2. PR_CC deleted
+	S_POSN_x moves up from 16441 $4039 to 16440 $4038
+	S_POSN_y moves up from 16442 $403A to 16441 $4039
+	CDFLAG moves up from 16443 $403B to 16442 $403A
+	MEMBOT moves up from 16444 $403C to 16443 $403B
+	NUSED2 moves up from 16474 $405A to 16473 $4059
 
