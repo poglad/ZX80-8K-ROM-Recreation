@@ -4166,6 +4166,8 @@ L0EAD:  RST     08H             ; ERROR-1
 
 ;; RUN
 L0EAF:  CALL    L0E81           ; routine GOTO
+		LD		BC,$0000		; restore to first line
+		CALL	L1E45			; routine REST-RUN
         JP      L149A           ; to CLEAR
 
 ; ---------------------------
