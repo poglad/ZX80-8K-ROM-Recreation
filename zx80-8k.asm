@@ -1260,8 +1260,13 @@ L03A8:  CALL    L0F55           ; routine SCANNING
 ;
 
 ;; NEW
-L03C3:  CALL    L02E7           ; routine SET-FAST
-        LD      BC,($4004)      ; fetch value of system variable RAMTOP
+L03C3:  CALL    L0EA7           ; routine FIND-INT
+        LD      A,B             ; test value
+        OR      C               ; for zero
+        JR      Z,NEW1          ; forward if zero to NEW1
+        LD      ($4004),BC      ; set value of RAMTOP system variable.
+
+NEW1	LD      BC,($4004)      ; fetch value of system variable RAMTOP
         DEC     BC              ; point to last system byte.
 
 ; -----------------------
