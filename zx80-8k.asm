@@ -4051,6 +4051,10 @@ L0EE5:  EX      (SP),HL         ;
 L0EE9:  BIT     7,(IY+$08)      ; sv PPC_hi
         JR      NZ,L0F21        ; to REPORT-8
 
+; uncomment the next line to include improvement from second ZX81 ROM
+; on the assumption that it was removed to save space when
+; adding the printer ROM routines, I shall restore it here
+; in this 'original' ROM
         CALL    L14A3           ; routine X-TEMP
         LD      HL,$402D        ; sv FLAGX
         SET     5,(HL)          ;
@@ -4183,7 +4187,12 @@ L0F32:  CALL    L0EA7           ; routine FIND-INT
         LD      L,C             ;
         CALL    L022D           ; routine DISPLAY-P
 
+; uncomment to include improvement from second ZX81 ROM
         LD      (IY+$35),$FF    ; sv FRAMES_hi
+; and comment this instead
+; clearly a space-saving version for the printer ROM, so
+; not to be included in the 'original' ROM
+;		SET		7,(IY+$35)
 
         JR      L0F4B           ; routine DEBOUNCE
 
