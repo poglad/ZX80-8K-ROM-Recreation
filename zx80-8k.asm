@@ -2776,7 +2776,7 @@ L0A73:  LD      HL,($4014)      ; sv E_LINE_lo
         BIT     5,(IY+$2D)      ; sv FLAGX
         RET     NZ              ;
 
-        LD      HL,$405D        ; sv MEM-0-1st
+        LD      HL,$403C        ; sv MEM-0-1st
         LD      ($401C),HL      ; sv STKEND_lo
         CALL    L1548           ; routine INT-TO-FP
         CALL    L158A           ; routine FP-TO-BC
@@ -5649,7 +5649,7 @@ L14AD:  LD      HL,($4014)      ; fetch start of edit line from E_LINE
 ;
 
 ;; SET-MIN
-L14BC:  LD      HL,$405D        ; normal location of calculator's memory area
+L14BC:  LD      HL,$403C        ; normal location of calculator's memory area
         LD      ($401F),HL      ; update system variable MEM
         LD      HL,($401A)      ; fetch STKBOT
         JR      L14A9           ; back to SET-STK-E
@@ -5729,7 +5729,7 @@ L14E5:  RST     20H             ; NEXT-CHAR
 L14F5:  CP      $2A             ; is character 'E' ?
         RET     NZ              ; return if not
 
-        LD      (IY+$5D),$FF    ; initialize sv MEM-0-1st to $FF TRUE
+        LD      (IY+$3C),$FF    ; initialize sv MEM-0-1st to $FF TRUE
 
         RST     20H             ; NEXT-CHAR
         CP      $15             ; is character a '+' ?
@@ -5738,7 +5738,7 @@ L14F5:  CP      $2A             ; is character 'E' ?
         CP      $16             ; is it a '-' ?
         JR      NZ,L1509        ; forward if not to ST-E-PART
 
-        INC     (IY+$5D)        ; sv MEM-0-1st change to FALSE
+        INC     (IY+$3C)        ; sv MEM-0-1st change to FALSE
 
 ;; SIGN-DONE
 L1508:  RST     20H             ; NEXT-CHAR

@@ -1,9 +1,9 @@
-ZX81 System Variables:
+ZX80 System Variables:
 
-Notes 	Address 	Name 	Contents
+Notes 	Address Name 	Contents
 1		16384	ERR_NR	1 less than the report code. Starts off at 255 (for - 1), so PEEK 16384, if it works at all, gives 255. POKE 16384,n can be used to force an error halt: 0  n  14 gives one of the usual reports, 15  n  34 or 99  n  127 gives a non-standard report, and 35  n  98 is liable to mess up the display file.
 X1		16385	FLAGS	Various flags to control the BASIC system.
-X2		16386	ERR_SP	Address of first item on machine stack (after GOSUB returns).
+X2		16386	ERR_SP	Address of first item on machine stack (after GO SUB returns).
 2		16388	RAMTOP	Address of first byte above BASIC system area. You can poke this to make NEW reserve space above that area (see chapter 26) or to fool CLS into setting up a minimal display file (chapter 27). Poking RAMTOP has no effect until one of these two is executed.
 N1		16390	MODE	Specified K, L, F or G cursor.
 N2		16391	PPC	Line number of statement currently being executed. Poking this has no lasting effect except in the last line of the program.
@@ -20,7 +20,7 @@ SX2		16410	STKBOT
 SX2		16412	STKEND	
 SN1		16414	BERG	Calculator's b register.
 SN2		16415	MEM		Address of area used for calculator's memory. (Usually MEMBOT, but not always.)
-S1		16417			not used	
+S1		16417	NUSED1	not used	
 SX1		16418	DF_SZ	The number of lines (including one blank line) in the lower part of the screen.
 S2		16419	S_TOP	The number of the top program line in automatic listings.
 SN2		16421	LAST_K	Shows which keys pressed.
@@ -39,6 +39,13 @@ S1		16440	PR_CC	Less significant byte of address of next position for LPRINT to 
 SX1		16441	S_POSN	Column number for PRINT position.
 SX1		16442			Line number for PRINT position.
 S1		16443	CDFLAG	Various flags. Bit 7 is on (1) during compute & display mode.
-S33		16444	PRBUFF	Printer buffer (33rd character is NEWLINE).
-SN30	16477	MEMBOT	Calculator's memory area; used to store numbers that cannot conveniently be put on the calculator stack.
-S2		16507	not used	
+SN30	16444	MEMBOT	Calculator's memory area; used to store numbers that cannot conveniently be put on the calculator stack.
+S2		16474	NUSED2	not used	
+
+1. PRBUFF deleted
+	MEMBOT moves up from 16477 $405D to 16444 $403C
+	NUSED2 moves up from 16507 $407B to 16474 $405A
+
+
+
+
