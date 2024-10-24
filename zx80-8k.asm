@@ -5002,10 +5002,10 @@ L120C:  PUSH    BC              ;
         CALL    L12FF           ; routine DE,(DE+1)
         EX      (SP),HL         ;
         EX      DE,HL           ;
+        DEC     HL              ; ZX80 arrays are 0-based
         CALL    L12DD           ; routine INT-EXP1
         JR      C,L1231         ; forward to REPORT-3
 
-        DEC     BC              ;
         CALL    L1305           ; routine GET-HL*DE
         ADD     HL,BC           ;
         POP     DE              ;
@@ -5102,8 +5102,11 @@ L1263:  CALL    L0DA6           ; routine SYNTAX-Z
         JR      Z,L1292         ; forward if so to SL-SECOND
 
         POP     AF              ;
+        DEC     HL              ; ZX80 arrays are 0-based
         CALL    L12DE           ; routine INT-EXP2
+        INC     HL              ; ZX80 arrays are 0-based
         PUSH    AF              ;
+        INC     BC              ; ZX80 arrays are 0-based
         LD      D,B             ;
         LD      E,C             ;
         PUSH    HL              ;
@@ -5133,8 +5136,10 @@ L1292:  PUSH    HL              ;
         JR      Z,L12A5         ; forward if so to SL-DEFINE
 
         POP     AF              ;
+        DEC     HL              ; ZX80 arrays are 0-based
         CALL    L12DE           ; routine INT-EXP2
         PUSH    AF              ;
+        INC     BC              ; ZX80 arrays are 0-based
 
         RST     18H             ; GET-CHAR
         LD      H,B             ;
@@ -5217,18 +5222,11 @@ L12DE:  PUSH    DE              ;
         PUSH    AF              ;
         CALL    L0EA7           ; routine FIND-INT
         POP     DE              ;
-        LD      A,B             ;
-        OR      C               ;
-        SCF                     ; Set Carry Flag
-        JR      Z,L12F9         ; forward to I-CARRY
-
         POP     HL              ;
         PUSH    HL              ;
         AND     A               ;
         SBC     HL,BC           ;
-
-;; I-CARRY
-L12F9:  LD      A,D             ;
+        LD      A,D             ;
         SBC     A,$00           ;
 
 ;; I-RESTORE
@@ -5576,7 +5574,7 @@ L1435:  RST     20H             ; NEXT-CHAR
         LD      H,$40           ;
         CALL    L12DD           ; routine INT-EXP1
         JP      C,L1231         ; jump back to REPORT-3
-
+        INC     BC              ; ZX80 arrays are 0-based
         POP     HL              ;
         PUSH    BC              ;
         INC     H               ;
