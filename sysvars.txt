@@ -1,0 +1,44 @@
+ZX81 System Variables:
+
+Notes 	Address 	Name 	Contents
+1		16384	ERR_NR	1 less than the report code. Starts off at 255 (for - 1), so PEEK 16384, if it works at all, gives 255. POKE 16384,n can be used to force an error halt: 0  n  14 gives one of the usual reports, 15  n  34 or 99  n  127 gives a non-standard report, and 35  n  98 is liable to mess up the display file.
+X1		16385	FLAGS	Various flags to control the BASIC system.
+X2		16386	ERR_SP	Address of first item on machine stack (after GOSUB returns).
+2		16388	RAMTOP	Address of first byte above BASIC system area. You can poke this to make NEW reserve space above that area (see chapter 26) or to fool CLS into setting up a minimal display file (chapter 27). Poking RAMTOP has no effect until one of these two is executed.
+N1		16390	MODE	Specified K, L, F or G cursor.
+N2		16391	PPC	Line number of statement currently being executed. Poking this has no lasting effect except in the last line of the program.
+S1		16393	VERSN	0 Identifies ZX81 BASIC in saved programs.
+S2		16394	E_PPC	Number of current line (with program cursor).
+SX2		16396	D_FILE	
+S2		16398	DF_CC	Address of PRINT position in display file. Can be poked so that PRINT output is sent elsewhere.
+SX2		16400	VARS	
+SN2		16402	DEST	Address of variable in assignment.
+SX2		16404	E_LINE	
+SX2		16406	CH_ADD	Address of the next character to be interpreted: the character after the argument of PEEK, or the NEWLINE at the end of a POKE statement.
+S2		16408	X_PTR	Address of the character preceding the  marker.
+SX2		16410	STKBOT	
+SX2		16412	STKEND	
+SN1		16414	BERG	Calculator's b register.
+SN2		16415	MEM		Address of area used for calculator's memory. (Usually MEMBOT, but not always.)
+S1		16417			not used	
+SX1		16418	DF_SZ	The number of lines (including one blank line) in the lower part of the screen.
+S2		16419	S_TOP	The number of the top program line in automatic listings.
+SN2		16421	LAST_K	Shows which keys pressed.
+SN1		16423			Debounce status of keyboard.
+SN1		16424	MARGIN	Number of blank lines above or below picture: 55 in Britain, 31 in America.
+SX2		16425	NXTLIN	Address of next program line to be executed.
+S2		16427	OLDPPC	Line number of which CONT jumps.
+SN1		16429	FLAGX	Various flags.
+SN2		16430	STRLEN	Length of string type destination in assignment.
+SN2		16432	T_ADDR	Address of next item in syntax table (very unlikely to be useful).
+S2		16434	SEED	The seed for RND. This is the variable that is set by RAND.
+S2		16436	FRAMES	Counts the frames displayed on the television. Bit 15 is 1. Bits 0 to 14 are decremented for each frame set to the television. This can be used for timing, but PAUSE also uses it. PAUSE resets to 0 bit 15, & puts in bits 0 to 14 the length of the pause. When these have been counted down to zero, the pause stops. If the pause stops because of a key depression, bit 15 is set to 1 again.
+S1		16438	COORDS	x-coordinate of last point PLOTted.
+S1		16439			y-coordinate of last point PLOTted.
+S1		16440	PR_CC	Less significant byte of address of next position for LPRINT to print as (in PRBUFF).
+SX1		16441	S_POSN	Column number for PRINT position.
+SX1		16442			Line number for PRINT position.
+S1		16443	CDFLAG	Various flags. Bit 7 is on (1) during compute & display mode.
+S33		16444	PRBUFF	Printer buffer (33rd character is NEWLINE).
+SN30	16477	MEMBOT	Calculator's memory area; used to store numbers that cannot conveniently be put on the calculator stack.
+S2		16507	not used	
