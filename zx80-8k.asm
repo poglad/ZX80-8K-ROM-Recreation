@@ -3109,7 +3109,7 @@ L0BCA:  PUSH    AF              ;
 L0BD9:  LD      B,A             ;
 
 ;; TABLE-PTR
-L0BDA:  LD      DE,L0C9E        ; Address: P-UNPLOT
+L0BDA:  LD      DE,L0CAB        ; Address: P-UNPLOT
         LD      A,($4030)       ; sv T_ADDR_lo
         SUB     E               ;
         JP      M,L0BE9         ; to PLOT
@@ -3199,13 +3199,6 @@ L0C0E:  LD      B,(IY+$22)      ; sv DF_SZ
 ; i) The Offset table
 
 ;; offset-t
-; -------------------
-; THE 'SYNTAX' TABLES
-; -------------------
-
-; i) The Offset table
-
-;; offset-t
 L0C29:  DEFB    L0CB4 - $       ; 8B offset to; Address: P-PLOT
         DEFB    L0CB7 - $       ; 8D offset to; Address: P-UNDRAW
         DEFB    L0C58 - $       ; 2D offset to; Address: P-STOP
@@ -3233,7 +3226,7 @@ L0C29:  DEFB    L0CB4 - $       ; 8B offset to; Address: P-PLOT
         DEFB    L0C86 - $       ; 45 offset to; Address: P-RAND
         DEFB    L0C4F - $       ; 0D offset to; Address: P-IF
         DEFB    L0C95 - $       ; 52 offset to; Address: P-CLS
-        DEFB    L0C9E - $       ; 5A offset to; Address: P-RESTORE
+        DEFB    L0CAB - $       ; 5A offset to; Address: P-RESTORE
         DEFB    L0C92 - $       ; 4D offset to; Address: P-CLEAR
         DEFB    L0C5B - $       ; 15 offset to; Address: P-RETURN
         DEFB    L0CB1 - $       ; 6A offset to; Address: P-DATA
@@ -3364,7 +3357,7 @@ L0C98:  DEFB    $05             ; Class-05 - Variable syntax checked entirely
 		DEFW    L1DED           ; Address: $1DED; Address: READ
 
 ;; P-RESTORE
-L0C9E:	DEFB    $03             ; Class-03 - A numeric expression may follow
+L0CAB:	DEFB    $03             ; Class-03 - A numeric expression may follow
                                 ; else default to zero.
 		DEFW	L1E42
 
