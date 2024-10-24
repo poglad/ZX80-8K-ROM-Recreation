@@ -1328,6 +1328,7 @@ L03E5:  LD      HL,($4004)      ; fetch system variable RAMTOP.
 
         LD      IY,$4000        ; set IY to the start of RAM so that the 
                                 ; system variables can be indexed.
+        LD		(IY+$21),$08	; default PFMT to 8
         LD      (IY+$3A),$40    ; set CDFLAG 0100 0000. Bit 6 indicates 
                                 ; Compute nad Display required.
 
@@ -2922,7 +2923,41 @@ L0B1E:  ADD     A,(IY+$38)      ; sv S_POSN_x
 ; ---
 
 ;; NOT-TAB
-L0B31:  CALL    L0F55           ; routine SCANNING
+L0B31:  CP		$C5				;
+        JR      NZ,NOT_TO       ; to NOT-TO
+
+		LD		C,$08			; default to 8 (B is zero)
+        RST     20H             ; NEXT-CHAR
+
+		CP		$19				; ';'
+		JR		Z,TO_ON
+		CP		$1A				; ','
+		JR		Z,TO_ON
+		CP		$76				;
+		JR		Z,TO_ON
+		CP		$2A				; 'E'
+		JR		Z,TO_E
+		CP		$1D				; '1'
+		JP		C,L1CAF			; REPORT-Ab
+		CP		$25				; '8'+1
+		JP		NC,L1CAF		; REPORT-Ab
+
+		SUB		$1C
+		LD		C,A				; A now holds 1 to 8
+
+		RST		20H
+		CP		$2A				; 'E'
+		JR		NZ,TO_ON
+
+TO_E:	RST     20H             ; NEXT-CHAR
+		SET		7,C
+
+TO_ON:	CALL    L0B4E           ; routine SYNTAX-ON
+		LD		(IY+$21),C      ; sv PFMT
+        JR      L0B37           ; to PRINT-ON
+
+;; NOT-TO
+NOT_TO: CALL    L0F55           ; routine SCANNING
         CALL    L0B55           ; routine PRINT-STK
 
 ;; PRINT-ON
@@ -6465,7 +6500,9 @@ L1615:  INC     HL              ; increase pointer
 
 
         INC     HL              ; advance pointer to one past buffer 
-        LD      BC,$0008        ; set C to 8 ( B is already zero )
+		LD		A,($4021)       ; get value in PFMT
+		AND		$7F             ; don't permit use of bit 7 as it's the E flag
+		LD 		C,A             ; ZX81 always used 8 for this
         PUSH    HL              ; save pointer.
 
 ;; PF-NULL
@@ -6506,20 +6543,23 @@ L1639:  POP     AF              ; retrieve carry from machine stack.
                                 ; to consider further rounding and/or trailing
                                 ; zero identification.
 
+        LD		A,$0E           ; initialize B
+		SUB		(IY+$21)        ; based on PFMT
+		AND		$0F             ; rather than hard-coding 6 below
+		LD		B,A             ; like the ZX81 did
+
         POP     AF              ; balance stack
         POP     HL              ; ** retrieve lower pointer
 
-; now insert 6 trailing zeros which are printed if before the decimal point
+; now insert B trailing zeros which are printed if before the decimal point
 ; but mark the end of printing if after decimal point.
 ; e.g. 9876543210123 is printed as 9876543200000
 ; 123.456001 is printed as 123.456
 
-        LD      B,$06           ; the count is six.
-
-;; PF-ZERO-6
+;; PF-ZERO-B
 L164B:  LD      (HL),$80        ; insert a masked zero
         DEC     HL              ; decrease pointer.
-        DJNZ    L164B           ; loop back for all six to PF-ZERO-6
+        DJNZ    L164B           ; loop back for all six to PF-ZERO-B
 
 ; n-mod-m reduced the number to zero and this is now deleted from the calculator
 ; stack before fetching the original estimate of leading digits.
@@ -6549,6 +6589,9 @@ L165F:  DEC     HL              ; decrement address.
         JR      Z,L165F         ; back with leading zero to GET-FIRST
 
 ; now determine if E-format printing is needed
+
+		BIT		7,(IY+$21)		; check flag in bit 7 of PFMT
+        JP      NZ,L1682        ; forward if formatted with E to PF-E-FMT
 
         LD      A,E             ; transfer now accurate number count to A.
         SUB     $05             ; subtract five

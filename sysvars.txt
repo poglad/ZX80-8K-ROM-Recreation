@@ -20,7 +20,7 @@ SX2		16410	STKBOT
 SX2		16412	STKEND	
 SN1		16414	BERG	Calculator's b register.
 SN2		16415	MEM		Address of area used for calculator's memory. (Usually MEMBOT, but not always.)
-S1		16417	NUSED1	not used	
+S1		16417	PFMT	Number printing format	
 SX1		16418	DF_SZ	The number of lines (including one blank line) in the lower part of the screen.
 S2		16419	S_TOP	The number of the top program line in automatic listings.
 SN2		16421	LAST_K	Shows which keys pressed.
@@ -55,3 +55,6 @@ S1		16474	NUSED2	not used
 
 3. DATADD introduced at 16473 $4049
 	NUSED2 moves up by 1 byte, becomes 1 byte long
+
+4. PFMT now uses 16417 $4021
+
