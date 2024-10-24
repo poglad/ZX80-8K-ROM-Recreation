@@ -18,7 +18,7 @@ SX2		16406	CH_ADD	Address of the next character to be interpreted: the character
 S2		16408	X_PTR	Address of the character preceding the  marker.
 SX2		16410	STKBOT	
 SX2		16412	STKEND	
-SN1		16414	BERG	Calculator's b register.
+SN1		16414	BREG	Calculator's b register.
 SN2		16415	MEM		Address of area used for calculator's memory. (Usually MEMBOT, but not always.)
 S1		16417	PFMT	Number printing format	
 SX1		16418	DF_SZ	The number of lines (including one blank line) in the lower part of the screen.
@@ -39,8 +39,7 @@ SX1		16441	S_POSN	Column number for PRINT position.
 SX1		16442			Line number for PRINT position.
 S1		16443	FLAGK	Keyboard debounce flag.
 SN30	16444	MEMBOT	Calculator's memory area; used to store numbers that cannot conveniently be put on the calculator stack.
-S1		16473	DATADD	Data address (READ, RESTORE, DATA).
-S1		16474	NUSED2	not used	
+S2		16473	DATADD	Data address (READ, RESTORE, DATA).
 
 1. PRBUFF deleted
 	MEMBOT moves up from 16477 $405D to 16444 $403C
@@ -53,9 +52,11 @@ S1		16474	NUSED2	not used
 	MEMBOT moves up from 16444 $403C to 16443 $403B
 	NUSED2 moves up from 16474 $405A to 16473 $4059
 
-3. DATADD introduced at 16473 $4049
-	NUSED2 moves up by 1 byte, becomes 1 byte long
+3. DATADD introduced at 16473 $4059 - actually 2 bytes, so NUSED2 now used.
 
 4. PFMT now uses 16417 $4021
 
 5. CDFLAG renamed to FLAGK, as ZX80 has no compute & display mode.
+
+6. Program start address is now 16475 $405B (was previously 16509 $407D).
+

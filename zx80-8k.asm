@@ -1337,8 +1337,8 @@ L03E5:  LD      HL,($4004)      ; fetch system variable RAMTOP.
         LD      (IY+$3A),$40    ; set FLAGK 0100 0000. Bit 6 indicates 
                                 ; Compute nad Display required.
 
-        LD      HL,$407D        ; The first location after System Variables -
-                                ; 16509 decimal.
+        LD      HL,$405B        ; The first location after System Variables -
+                                ; 16475 decimal.
         LD      ($400C),HL      ; set system variable D_FILE to this value.
         LD      B,$19           ; prepare minimal screen of 24 NEWLINEs
                                 ; following an initial NEWLINE.
@@ -2589,7 +2589,7 @@ L09C8:  INC     HL              ;
 
 ;; LINE-ADDR
 L09D8:  PUSH    HL              ;
-        LD      HL,$407D        ;
+        LD      HL,$405B        ;
         LD      D,H             ;
         LD      E,L             ;
 
